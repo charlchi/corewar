@@ -40,6 +40,7 @@ int				is_action(t_vm *vm, unsigned char c)
 {
 	int k;
 
+	//  Conditional jump or move depends on uninitialised value(s)
 	k = 0;
 	while (k < 16)
 	{

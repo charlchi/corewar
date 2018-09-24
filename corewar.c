@@ -12,10 +12,6 @@
 
 #include "libft/libft.h"
 #include "corewar.h"
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
-#include <GLUT/glut.h>
 
 t_vm	*g_vm;
 
@@ -23,11 +19,10 @@ int		main(int ac, char **av)
 {
 	t_vm		vm;
 
-	int wd;
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(64*16, 64*16);
-	wd = glutCreateWindow("corewar");
+	glutInitWindowSize(64*12, 64*12);
+	glutCreateWindow("corewar");
 	glDisable(GL_DEPTH_TEST);
 	glutDisplayFunc(run_vm);
 	glutIdleFunc(run_vm);
@@ -40,45 +35,40 @@ int		main(int ac, char **av)
 		ft_nbrendl(vm.num_champs);
 		ft_putstr("load_vm\n");
 		load_vm(&vm);
-		ft_putstr("putarena\n");
-		ft_putarena(vm.arena, MEM_SIZE);
 	}
 	printf("%p\n", vm.first);
 	g_vm = &vm;
-	glPixelZoom(16.0, 16.0);
+	glPixelZoom(10.0, 10.0);
 	glutMainLoop();
 	//run_vm(&vm);
 }
 
 void	run_vm(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	int			pixels[64 * 64];
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//int			pixels[64 * 64];
 
 
 
 	t_process	*cursor;
 	t_vm		*vm;
 
-	vm = g_vm; // remove this
-	//ft_putstr("still running ");
-	//ft_putnbr(vm->total_cycles);
-	//ft_putstr("\n");
+	vm = g_vm;
 
 	cursor = vm->first;
 	int gg = 0;
 	while (cursor)
 	{
-		printf("exec cursor %d\n", gg);
+		//printf("exec cursor %d\n", gg);
 		if (!cursor->dead_flag)
 			execute_process(vm, cursor);
 		//if (cursor->pc < 0) cursor->pc = ((cursor->pc * - 1) % MEM_SIZE);
 		cursor->pc = cursor->pc % MEM_SIZE;
-		printf("%d pc %d \n", gg, cursor->pc);
+		//printf("%d pc %d \n", gg, cursor->pc);
 		cursor = cursor->next;
 		gg++;
 	}
-	printf("here\n");
+	printf("number of cursors----------------->%d\n", gg);
 	vm->total_cycles++;
 	vm->cycle--;
 	if (!vm->cycle)
@@ -91,11 +81,8 @@ void	run_vm(void)
 		}
 		vm->cycle = vm->cycle_to_die;
 	}
-	printf("Done one cycle\n");
 
-
-
-
+/*
 	int i = 0;
 	while (i < 64 * 64)
 	{
@@ -111,11 +98,10 @@ void	run_vm(void)
 			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0555500;
 		cursor = cursor->next;
 	}
-
-	glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
-	glutSwapBuffers();
-	glFlush();
-	printf("Done drawing\n");
+*/
+	//glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
+	//glutSwapBuffers();
+	//glFlush();
 	//}
 	//exit_sequence(vm);
 }

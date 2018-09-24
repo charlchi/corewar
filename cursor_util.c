@@ -23,7 +23,6 @@ void	add_cursor(t_vm *vm, t_process *cursor)
 {
 	t_process		*curr;
 	
-	printf("________adding cursor____________\n");
 	if (vm->first == NULL)
 	{
 		vm->first = cursor;
@@ -31,14 +30,9 @@ void	add_cursor(t_vm *vm, t_process *cursor)
 	else
 	{
 		curr = vm->first;
-		printf("add_cursor vm->first %p \n", curr);
 		while (curr->next)
-		{
 			curr = curr->next;
-			printf("add_cursor %p \n", curr);
-		}
 		curr->next = cursor;
-		printf("add_cursor done %p \n", curr);
 	}
 }
 
@@ -80,7 +74,6 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		cursor->waitcycles--;
 		return ;
 	}
-	printf("attempting arena access at %d\n", cursor->pc);
 	k = is_action(vm, vm->arena[cursor->pc]);
 	if (k)
 	{

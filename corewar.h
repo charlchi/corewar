@@ -13,9 +13,24 @@
 #ifndef COREWAR_H
 # define COREWAR_H
 
+#ifdef __linux__
+# include <GL/gl.h>
+# include <GL/glut.h>
+# include <GL/glu.h>
+#endif
+
+#ifdef __APPLE__
+# include <OpenGL/gl.h>
+# include <OpenGL/glu.h>
+# include <GLUT/glut.h>
+#endif
+
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 # include "libft/libft.h"
 # include "op.h"
 # include <stdlib.h>
+# include <stdio.h>
 
 typedef struct		s_process
 {
@@ -39,7 +54,7 @@ typedef struct  	s_champ
 	unsigned char	magic[4];
 	char			*name;
 	int				ldnbr;
-    unsigned char	number[4];
+    unsigned int	number;
 	int				start_index;
 	int				lives;
 	int				last_live;
@@ -102,5 +117,6 @@ void				puthex(char byte);
 void				ft_putarena(unsigned char *arena, int size);
 void				place_player(t_champ *champ, int start, t_vm *vm);
 void				load_vm(t_vm *vm);
+void				set_op_tab(t_vm *vm);
 
 #endif

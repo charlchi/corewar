@@ -94,7 +94,6 @@ int		ft_contains(char *whole, char *part)
 void count_champs(t_vm *vm, int ac, char **av)
 {
 	int i = 1;
-	int num_players = 0;
 	int fd = 0;
 	while (i < ac)
 	{
@@ -109,10 +108,11 @@ void count_champs(t_vm *vm, int ac, char **av)
 			}
 			else
 			{
-				vm->champs[num_players].ldnbr = num_players;
-				vm->champs[num_players].name = ft_strdup(av[i]);
-				ft_putendl_fd(vm->champs[num_players].name, 1);
-				num_players++;
+				vm->champs[vm->num_champs].ldnbr = vm->num_champs;
+				vm->champs[vm->num_champs].number = vm->num_champs;
+				vm->champs[vm->num_champs].name = ft_strdup(av[i]);
+				ft_putendl_fd(vm->champs[vm->num_champs].name, 1);
+				vm->num_champs++;
 				col_str_fd(FGRN, "Valid File\t:\t", 1);
 				ft_putendl_fd(av[i], 1);
 			}
@@ -120,13 +120,17 @@ void count_champs(t_vm *vm, int ac, char **av)
 		}
 		i++;
 	}
-	vm->num_champs = (num_players <= 4 ? num_players : 0);
+	printf("number of champs %d\n", vm->num_champs);
 }
 
 void	init(t_vm *vm)
 {
 	vm->num_champs = 0;
 	vm->first = NULL;
+	vm->total_cycles = 0;
+	vm->cycle = 0;
+	vm->cycle_to_die = CYCLE_TO_DIE;
+	vm->lives = 0;
 	ft_bzero(vm->arena, MEM_SIZE);
 	set_op_tab(vm);
 }
@@ -155,7 +159,7 @@ char	*uctohex(int byte)
 
 void	puthex(char byte)
 {
-	char		hex[20] = "0123456789abcdef";
+	char		hex[17] = "0123456789abcdef";
 	ft_putchar(hex[(byte & 0xf0) >> 4]);
 	ft_putchar(hex[(byte & 0x0f)]);
 }
@@ -164,7 +168,6 @@ void	ft_putarena(unsigned char *arena, int size)
 {
 	int index;
 
-	(void)arena;
 	index = 0;
 	while (index < size)
 	{
@@ -211,13 +214,9 @@ void	load_vm(t_vm *vm)
 	{
 		vm->champs[player].start = vm->champs[player].ldnbr * (MEM_SIZE/vm->num_champs);
 		cursor = create_cursor(vm->champs[player].start);
-
 		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;
-		printf("init waitcycles %d\n", cursor->waitcycles);
 		add_cursor(vm, cursor);
 		place_player(&vm->champs[player], vm->champs[player].start, vm);
-		printf("%p\n", cursor);
-		printf("testerino makerino, %d, %d\n", cursor->pc, vm->arena[cursor->pc]);
 		player++;
 	}
 	ft_putstr("Done load_vm\n");

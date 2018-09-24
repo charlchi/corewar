@@ -19,8 +19,10 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 
 	cursor->pc++;
 	param1 = consume_param(vm->arena, &cursor->pc, 2);
-	if (cursor->carry)
+	//if (cursor->carry)
+	//{
 		cursor->pc = (cursor->pc + (param1 % IDX_MOD)) % MEM_SIZE;
+	//}
 }
 
 void	cw_ldi(t_vm *vm, t_process *cursor)
@@ -83,7 +85,7 @@ void	cw_fork(t_vm *vm, t_process *cursor)
 
 	cursor->pc++;
 	param1 = consume_param(vm->arena, &cursor->pc, 4);
-	newcursor = clone_cursor(cursor, cursor->pc - 1 + (param1 % IDX_MOD));
+	newcursor = clone_cursor(cursor, (cursor->pc - 1 + (param1 % IDX_MOD)) % MEM_SIZE);
 	newcursor->carry = 0;
 	add_cursor(vm, newcursor);
 }
