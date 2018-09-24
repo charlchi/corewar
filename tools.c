@@ -14,16 +14,17 @@
 
 unsigned int	uctoi(unsigned char *pos, int bytes)
 {
-
 	int				i;
 	unsigned int	ret;
-
-	printf("uctoi byte %d", *pos);
-	i = 0;
-	ret = 0;
-	while (++i <= bytes)
-		ret += (pos[i] << ((bytes - i) * 8));
-	printf("ret %d\n", ret);
+	
+	ret = pos[0];
+	i = 1;
+	while (i < bytes)
+	{
+		ret = ret << 8;
+		ret += pos[i];
+		i++;
+	}
 	return (ret);
 }
 
@@ -43,7 +44,10 @@ int				is_action(t_vm *vm, unsigned char c)
 	while (k < 16)
 	{
 		if (vm->op_tab[k].id == c)
+		{
+			printf("\n%d is_action: %s %d\n\n", k, vm->op_tab[k].name, vm->op_tab[k].cycles);
 			return (c);
+		}
 		k++;
 	}
 	return (0);

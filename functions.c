@@ -25,6 +25,7 @@ void	cw_live(t_vm *vm, t_process *cursor)
 			vm->champs[i].lives++;
 			vm->champs[i].last_live = vm->total_cycles;
 		}
+		i++;
 	}
 	cursor->live_flag = 1;
 	cursor->pc += 5;
@@ -53,9 +54,11 @@ void	cw_st(t_vm *vm, t_process *cursor)
 
 	cursor->pc++;
 	acb = vm->arena[cursor->pc++];
+	//int test = ;
+	//printf("reg index %d\n", test);
 	param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
 	if (acb == 0b01110000)
-		itouc(&vm->arena[consume_param(vm->arena, &cursor->pc, 2)], param1);
+		itouc(&vm->arena[consume_param(vm->arena, &cursor->pc, 2) % MEM_SIZE], param1);
 	else if (acb == 0b01010000)
 		cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1;
 }

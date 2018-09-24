@@ -23,6 +23,7 @@ void	add_cursor(t_vm *vm, t_process *cursor)
 {
 	t_process		*curr;
 	
+	printf("________adding cursor____________\n");
 	if (vm->first == NULL)
 	{
 		vm->first = cursor;
@@ -30,10 +31,14 @@ void	add_cursor(t_vm *vm, t_process *cursor)
 	else
 	{
 		curr = vm->first;
-		//printf("add_cursor vm->first %p \n", curr);
-		while (curr)
+		printf("add_cursor vm->first %p \n", curr);
+		while (curr->next)
+		{
 			curr = curr->next;
-		curr = cursor;
+			printf("add_cursor %p \n", curr);
+		}
+		curr->next = cursor;
+		printf("add_cursor done %p \n", curr);
 	}
 }
 
@@ -87,10 +92,12 @@ void	execute_process(t_vm *vm, t_process *cursor)
 	{
 		cursor->pc++;
 	}
-	//printf("index %d apparent waitcycles %d\n",
-		//vm->arena[cursor->pc], vm->op_tab[vm->arena[cursor->pc]].cycles);
-	cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;
-	//printf("exec end waitcycles %d\n", cursor->waitcycles);
+	printf("cursor->pc %d\n", cursor->pc);
+	printf("index %d apparent waitcycles %d\n", vm->arena[cursor->pc] - 1, vm->op_tab[vm->arena[cursor->pc] - 1].cycles);
+	cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc] - 1].cycles;
+	printf("exec end waitcycles %d\n", cursor->waitcycles);
+	if (cursor->waitcycles > 1000)
+		exit(0);
 }
 
 

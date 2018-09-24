@@ -55,6 +55,7 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 	int		param2;
 	int		param3;
 
+
 	cursor->pc++;
 	acb = vm->arena[cursor->pc++];
 	param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
@@ -66,10 +67,11 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 		param3 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
 	else //if (((acb & 0b00000100) >> 2) == 2)
 		param3 = consume_param(vm->arena, &cursor->pc, 1);
+	printf("pc %d\n", cursor->pc);
 	printf("%d %d %d\n", param1, param2, param3);
 	param2 += param3;
 
-	itouc(&vm->arena[param2], param1);
+	itouc(&vm->arena[param2 % MEM_SIZE], param1);
 }
 
 void	cw_fork(t_vm *vm, t_process *cursor)
