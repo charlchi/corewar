@@ -77,17 +77,20 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 	instructions = ft_strsplit(asml, ' ');
 	if (is_label(instructions[j]))
 		add_label(instructions[j++], i, list);
-	while (++k < 17)
+	if (instructions[1])
 	{
-		if (ft_strequ(instructions[j], parser->op_tab[k].name))
+		while (++k < 17)
 		{
-			
-			i += (parser->op_tab[k].acb ? 2 : 1);
-			break ;
+			if (ft_strequ(instructions[j], parser->op_tab[k].name))
+			{
+				
+				i += (parser->op_tab[k].acb ? 2 : 1);
+				break ;
+			}
 		}
+		while (instructions[++j])
+			i += instruction_val(parser, instructions[j], k);
 	}
-	while (instructions[++j])
-		i += instruction_val(parser, instructions[j], k);
 	free_split(instructions);
 	return (i);
 }
@@ -107,13 +110,17 @@ int			get_label_index(t_labels *list, char *label)
 
 }
 
-void		first_pass(t_parser *parser, t_labels **list)
+int			first_pass(t_parser *parser, t_labels **list)
 {
 	int		i;
 	char	*asml;
 
 	i = 0;
 	while ((asml = get_asm_line(parser)))
+	{
+		printf("%s\n", asml);
 		i = create_labels(parser, asml, i, list);
+	}
+	return (i);
 }
 

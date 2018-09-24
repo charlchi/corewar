@@ -42,7 +42,7 @@ char	*strip_asm(char *str)
 	while (str[j] == ' ')
 		j--;
 	str[j + 1] = '\0';
-	return (str + i);
+	return (ft_strdup(str + i));
 }
 
 char	*get_asm_line(t_parser *parser)
@@ -61,6 +61,7 @@ char	*get_asm_line(t_parser *parser)
 	}
 	while (r > 0 && ft_strlen(asml) == 0)
 	{
+		free(asml);
 		parser->line++;
 		parser->col = 0;
 		r = get_next_line(parser->ifd, &l);

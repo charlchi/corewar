@@ -1,7 +1,4 @@
-#by zaz, still not as good as rainbowdash though
-#2013
-
-.name		"helltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrainhelltrain"
+.name		"helltrainhelllltrainhelltrainhelltrainhelltrainhelltrain"
 .comment	"choo-choo, motherf*****s !"
 
 entry:

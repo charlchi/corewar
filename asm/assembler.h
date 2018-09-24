@@ -43,7 +43,7 @@ void		add_label(char *str, int i, t_labels **list);
 int			get_label_index(t_labels *list, char *label);
 int			instruction_val(t_parser *parser, char *str, int k);
 int			create_labels(t_parser *parser, char *asml, int i, t_labels **list);
-void		first_pass(t_parser *parser, t_labels **list);
+int			first_pass(t_parser *parser, t_labels **list);
 char		*strip_asm(char *str);
 char		*get_asm_line(t_parser *parser);
 void		add_bytes(t_parser *parser, char *s, int n);

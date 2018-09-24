@@ -16,20 +16,24 @@
 void	parse_acb(t_parser *parser, char **tokens, int i)
 {
 	int		j;
+	int		k;
 	int		opcode;
 
 	opcode = 0;
 	j = 0;
-	while (j < parser->op_tab[i].nargs)
+	k = 3;
+	while (j < parser->op_tab[i - 1].nargs)
 	{
-		if (tokens[j][0] == 'r')                       
-			opcode += (1 << ((3 - j) * 2));
+		if (tokens[j][0] == 'r')
+			opcode += (1 << (k * 2));
 		else if (tokens[j][0] == DIRECT_CHAR)
-			opcode += (2 << ((3 - j) * 2));
-		else if (ft_isdigit(tokens[j][0]))
-			opcode += (3 << ((3 - j) * 2));
+			opcode += (2 << (k * 2));
+		else
+			opcode += (3 << (k * 2));
 		j++;
+		k--;
 	}
+	printf("\n");
 	add_byte(parser, (char)opcode);
 	parser->pc++;
 }
@@ -56,7 +60,7 @@ void	parse_params(t_parser *parser, char **tokens, int i)
 	int		j;
 	int		startpc;
 
-	startpc = parser->pc;
+	startpc = parser->pc - 1;
 	if (parser->op_tab[i - 1].acb)
 	{
 		parse_acb(parser, tokens, i);
@@ -73,7 +77,7 @@ void	parse_params(t_parser *parser, char **tokens, int i)
 			if (tokens[j][1] == LABEL_CHAR) // direct label value
 			{
 				num = get_label_index(parser->list, &tokens[j][2]);
-				num = num >= startpc ? num - startpc : startpc + MEM_SIZE - num;
+				num = num >= startpc ? num - startpc : 0xffff - (startpc - num) + 1;
 				bytestr(parser, num, 4);
 			}
 			else
@@ -86,7 +90,7 @@ void	parse_params(t_parser *parser, char **tokens, int i)
 			if (tokens[j][1] == LABEL_CHAR) // direct label value
 			{
 				num = get_label_index(parser->list, &tokens[j][2]);
-				num = num >= startpc ? num - startpc : startpc + MEM_SIZE - num;
+				num = num >= startpc ? num - startpc : 0xffff - (startpc - num) + 1;
 				bytestr(parser, num, 2);
 			}
 			else
@@ -94,9 +98,11 @@ void	parse_params(t_parser *parser, char **tokens, int i)
 				bytestr(parser, ft_atoi(&tokens[j][1]), 2);
 			}
 		}
-		else if (ft_isdigit(tokens[j][0]))
+		else if (ft_isdigit(tokens[j][0]) || tokens[j][0] == '-')
 		{ // indirect ???
-			bytestr(parser, ft_atoi(&tokens[j][1]), 2);
+			printf("token indirect %s\n", tokens[j]);
+			printf("%d\n", ft_atoi(&tokens[j][0]));
+			bytestr(parser, ft_atoi(&tokens[j][0]), 2);
 		}
 		parser->pc += instruction_val(parser, tokens[j], i - 1);
 		j++;
@@ -120,22 +126,28 @@ void	parse_program(t_parser *parser)
 		tokens = ft_strsplit(l, ' ');
 		if (ft_strchr(tokens[0], ':')) // TODO: don't skip label
 			tokens++;
-		i = 1;
-		while (i < 17)
+		if (tokens[0])
 		{
-			if (ft_strncmp(tokens[0], parser->op_tab[i].name,
-				ft_strlen(parser->op_tab[i].name)) == 0)
-				break ;
-			i++;
+			i = 0;
+			while (i < 16)
+			{
+				printf("[%s][%s]", tokens[0], parser->op_tab[i].name);
+				if (ft_strequ(tokens[0], parser->op_tab[i].name))
+					break ;
+				i++;
+			}
+			printf("%s %d\n", tokens[0], i);
+			//There should be a check to see that there was a valid instruction
+			add_byte(parser, (char)parser->op_tab[i].id);
+			parser->pc++;
+			tokens++;
+			parse_params(parser, tokens, parser->op_tab[i].id);
 		}
-		//There should be a check to see that there was a valid instruction
-		add_byte(parser, (char)parser->op_tab[i].id);
-		parser->pc++;
-		tokens++;
-		parse_params(parser, tokens, parser->op_tab[i].id);
 	}
+	printf("THUAHSDFIHASDIODSHADHIOS\n");
 	int test = 0;
-	while (test <= parser->pos)
+	printf("%d\n", parser->pos);
+	while (test < parser->pos)
 	{
 		write(parser->ofd, &parser->program[test++], 1);
 	}
@@ -149,10 +161,12 @@ void	parse_name(t_parser *parser)
 	int		j;
 
 	l = get_asm_line(parser);
-	if (ft_strncmp(".name \"", l, 6) != 0)
+	printf("%s\n", l);
+	if (ft_strncmp(".name", l, 5) != 0)
 		asm_parse_err(parser,
-			"Champion .name invalid\nExpected .name \"championname\"\n");
-	i = 7;
+			"Expected .name \"championname\"\n");
+	i = 8;
+	printf("%c\n", l[8]);
 	j = 0;
 	while (l[i] != '"' && l[i])
 	{
@@ -190,9 +204,11 @@ void	parse_comment(t_parser *parser)
 
 void	parse_champion(char *ifile)
 {
+	printf("hello\n");
 	t_parser	*parser;
 	char		*ofile;
 	t_labels	*list;
+	int			k;
 
 	parser = (t_parser *)malloc(sizeof(t_parser));
 	set_op_tab(parser);
@@ -208,7 +224,9 @@ void	parse_champion(char *ifile)
 	// get rid of name and comment, then get labels
 	get_asm_line(parser);
 	get_asm_line(parser);
-	first_pass(parser, &list);
+	printf("First pass\n");
+	k = first_pass(parser, &list);
+	printf("First pass done\n");
 	parser->list = list;
 	close(parser->ifd);
 
@@ -220,7 +238,8 @@ void	parse_champion(char *ifile)
 	parser->pc = 0;
 	add_bytes(parser, "\x00\xea\x83\xf3", 4);
 	parse_name(parser);
-	add_bytes(parser, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff", 12);
+	add_bytes(parser, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 10);
+	bytestr(parser, k, 2);
 	parse_comment(parser);
 	parse_program(parser);
 	free(ofile);

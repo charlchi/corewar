@@ -38,8 +38,10 @@ void	cw_ldi(t_vm *vm, t_process *cursor)
 		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
 	else //if ((((acb & 0b00100000) >> 4) & 0b10) > 0)
 		param1 = consume_param(vm->arena, &cursor->pc, 2);
+	int test = consume_param(vm->arena, &cursor->pc, 2);
+	printf("register %d\n", test);
 	if (((acb & 0b00001000) >> 2) == 1)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
+		param2 = cursor->reg[test];
 	else //if (((acb & 0b00000100) >> 2) == 2)
 		param2 = consume_param(vm->arena, &cursor->pc, 1);
 	param3 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];

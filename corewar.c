@@ -108,7 +108,7 @@ void	run_vm(void)
 		if (vm->total_cycles % 8 < 4)
 			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0000000;
 		else 
-			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0ffff00;
+			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0555500;
 		cursor = cursor->next;
 	}
 
