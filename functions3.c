@@ -15,7 +15,7 @@
 
 void	cw_zjmp(t_vm *vm, t_process *cursor)
 {
-	int param1;
+	unsigned int param1;
 
 	cursor->pc++;
 	param1 = consume_param(vm->arena, &cursor->pc, 2);

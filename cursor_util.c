@@ -74,13 +74,13 @@ void	kill_cursors(t_vm *vm)
 
 void	execute_process(t_vm *vm, t_process *cursor)
 {
-	//printf("execute cursor %p at %d wait: %d\n", cursor, cursor->pc, cursor->waitcycles);
 	int k;
 	if (cursor->waitcycles)
 	{
 		cursor->waitcycles--;
 		return ;
 	}
+	printf("attempting arena access at %d\n", cursor->pc);
 	k = is_action(vm, vm->arena[cursor->pc]);
 	if (k)
 	{
@@ -88,9 +88,10 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		cw_funcs[k - 1](vm, cursor);
 		printf("done, now at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
 	}
-	while (!is_action(vm, vm->arena[cursor->pc]))
+	if (!is_action(vm, vm->arena[cursor->pc]))
 	{
 		cursor->pc++;
+		return ;
 	}
 	printf("cursor->pc %d\n", cursor->pc);
 	printf("index %d apparent waitcycles %d\n", vm->arena[cursor->pc] - 1, vm->op_tab[vm->arena[cursor->pc] - 1].cycles);

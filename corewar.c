@@ -69,19 +69,21 @@ void	run_vm(void)
 	int gg = 0;
 	while (cursor)
 	{
-		//printf("-------------------------------------------> cursor %d\n", gg);
+		printf("exec cursor %d\n", gg);
 		if (!cursor->dead_flag)
 			execute_process(vm, cursor);
+		//if (cursor->pc < 0) cursor->pc = ((cursor->pc * - 1) % MEM_SIZE);
 		cursor->pc = cursor->pc % MEM_SIZE;
+		printf("%d pc %d \n", gg, cursor->pc);
 		cursor = cursor->next;
-		//printf("cursor %p \n", cursor);
 		gg++;
 	}
+	printf("here\n");
 	vm->total_cycles++;
 	vm->cycle--;
 	if (!vm->cycle)
 	{
-		kill_cursors(vm);
+		//kill_cursors(vm);
 		if (vm->lives >= NBR_LIVE)
 		{
 			if (!(vm->cycle_to_die < CYCLE_DELTA))
@@ -89,6 +91,7 @@ void	run_vm(void)
 		}
 		vm->cycle = vm->cycle_to_die;
 	}
+	printf("Done one cycle\n");
 
 
 
@@ -96,21 +99,23 @@ void	run_vm(void)
 	int i = 0;
 	while (i < 64 * 64)
 	{
-		pixels[64*64 - 1 - i] = vm->arena[i] * 1000;
+		pixels[64*64 - 1 - i] = vm->arena[i] * 50000;
 		i++;
 	}
 	cursor = vm->first;
 	while (cursor)
 	{
-		pixels[64*64 - 1 - cursor->pc] = 0xf0f0f0f0;
+		if (vm->total_cycles % 8 < 4)
+			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0000000;
+		else 
+			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0ffff00;
 		cursor = cursor->next;
 	}
-
-	glBegin(GL_POLYGON);
 
 	glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
 	glutSwapBuffers();
 	glFlush();
+	printf("Done drawing\n");
 	//}
 	//exit_sequence(vm);
 }

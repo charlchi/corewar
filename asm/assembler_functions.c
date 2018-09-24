@@ -6,7 +6,7 @@
 /*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/11 12:21:16 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/12 15:10:28 by cmoller          ###   ########.fr       */
+/*   Updated: 2018/09/24 12:30:46 by mgerber          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,17 @@ char	*get_asm_line(t_parser *parser)
 	parser->col = 0;
 	asml = NULL;
 	if ((r = get_next_line(parser->ifd, &l) > 0))
+	{
 		asml = strip_asm(l);
+		free(l);
+	}
 	while (r > 0 && ft_strlen(asml) == 0)
 	{
 		parser->line++;
 		parser->col = 0;
 		r = get_next_line(parser->ifd, &l);
 		asml = strip_asm(l);
+		free(l);
 	}
 	return (asml);
 }
@@ -84,3 +88,4 @@ void	add_byte(t_parser *parser, int c)
 	parser->program[parser->pos] = (int)c;
 	parser->pos++;
 }
+

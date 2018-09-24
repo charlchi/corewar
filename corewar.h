@@ -87,7 +87,7 @@ void				cw_aff(t_vm *vm, t_process *cursor);
 unsigned int		uctoi(unsigned char *pos, int bytes);
 void				itouc(unsigned char *pos, unsigned int num);
 int					is_action(t_vm *vm, unsigned char c);
-int					consume_param(unsigned char *pos, int *pc, int bytes);
+unsigned int		consume_param(unsigned char *pos, int *pc, int bytes);
 void				col_endl_fd(char *colour, char *str, int fd);
 void				col_char_fd(char *colour, char c, int fd);
 void				col_str_fd(char *colour, char *str, int fd);

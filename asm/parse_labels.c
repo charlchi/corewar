@@ -6,12 +6,11 @@
 /*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/12 09:13:40 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/12 12:33:53 by mgerber          ###   ########.fr       */
+/*   Updated: 2018/09/24 12:39:13 by mgerber          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "assembler.h"
-
 #include <stdio.h>
 
 int			is_label(char *str)
@@ -36,22 +35,24 @@ t_labels	*new_label(char *str, int i)
 	return (label);
 }
 
-void		add_label(char *str, int i, t_labels *list)
+void		add_label(char *str, int i, t_labels **list)
 {
 	t_labels	*label;
 	t_labels	*head;
 
 	label = new_label(str, i);
-	head = list;
-	if (list) // this is not supposed to be true if there have been no labels thus far, however I have not been able to get it to do as such
+	head = *list;
+	if (head) // this is not supposed to be true if there have been no labels thus far, however I have not been able to get it to do as such
 	{
 		while (head->next)
 			head = head->next;
 		head->next = label;
 	}
 	else
-		list = label;
+		*list = label;
 }
+
+
 
 int			instruction_val(t_parser *parser, char *str, int k)
 {
@@ -62,7 +63,7 @@ int			instruction_val(t_parser *parser, char *str, int k)
 	return (IND_SIZE);
 }
 
-int			create_labels(t_parser *parser, char *asml, int i, t_labels *list)
+int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 {
 	char	*r;
 	char	**instructions;
@@ -106,7 +107,7 @@ int			get_label_index(t_labels *list, char *label)
 
 }
 
-void		first_pass(t_parser *parser, t_labels *list)
+void		first_pass(t_parser *parser, t_labels **list)
 {
 	int		i;
 	char	*asml;
@@ -115,3 +116,4 @@ void		first_pass(t_parser *parser, t_labels *list)
 	while ((asml = get_asm_line(parser)))
 		i = create_labels(parser, asml, i, list);
 }
+

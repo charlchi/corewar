@@ -54,11 +54,13 @@ void	cw_st(t_vm *vm, t_process *cursor)
 
 	cursor->pc++;
 	acb = vm->arena[cursor->pc++];
-	//int test = ;
-	//printf("reg index %d\n", test);
-	param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
+	int test = consume_param(vm->arena, &cursor->pc, 1);
+	printf("reg index %d\n", test);
+	param1 = cursor->reg[test];
+	test = consume_param(vm->arena, &cursor->pc, 2);
+	printf("reg index %d\n", test);
 	if (acb == 0b01110000)
-		itouc(&vm->arena[consume_param(vm->arena, &cursor->pc, 2) % MEM_SIZE], param1);
+		itouc(&vm->arena[test % MEM_SIZE], param1);
 	else if (acb == 0b01010000)
 		cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1;
 }

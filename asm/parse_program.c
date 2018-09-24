@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   parse_program.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/12 09:13:40 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/17 14:14:52 by cmoller          ###   ########.fr       */
+/*   Updated: 2018/09/24 12:30:46 by mgerber          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "assembler.h"
-
 #include <stdio.h>
 
 void	parse_acb(t_parser *parser, char **tokens, int i)
@@ -57,10 +56,11 @@ void	parse_params(t_parser *parser, char **tokens, int i)
 	int		j;
 	int		startpc;
 
-	printf("%s, %d\n", tokens[0], parser->pc);
 	startpc = parser->pc;
 	if (parser->op_tab[i - 1].acb)
+	{
 		parse_acb(parser, tokens, i);
+	}
 	j = 0;
 	while (j < parser->op_tab[i - 1].nargs)
 	{
@@ -118,29 +118,28 @@ void	parse_program(t_parser *parser)
 		while ((r = ft_strchr(l, SEPARATOR_CHAR)))
 			*r = ' ';
 		tokens = ft_strsplit(l, ' ');
-		if (ft_strchr(tokens[0], ':'))
-		{
-			(ft_strchr(tokens[0], ':'))[0] = '\0';
+		if (ft_strchr(tokens[0], ':')) // TODO: don't skip label
 			tokens++;
-		}
-		i = 0;
+		i = 1;
 		while (i < 17)
-		{	
-			if (ft_strequ(tokens[0], parser->op_tab[i].name))
+		{
+			if (ft_strncmp(tokens[0], parser->op_tab[i].name,
+				ft_strlen(parser->op_tab[i].name)) == 0)
 				break ;
 			i++;
 		}
+		//There should be a check to see that there was a valid instruction
 		add_byte(parser, (char)parser->op_tab[i].id);
+		parser->pc++;
 		tokens++;
 		parse_params(parser, tokens, parser->op_tab[i].id);
-		parser->pc++;
 	}
-
 	int test = 0;
 	while (test <= parser->pos)
 	{
 		write(parser->ofd, &parser->program[test++], 1);
 	}
+
 }
 
 void	parse_name(t_parser *parser)
@@ -197,7 +196,7 @@ void	parse_champion(char *ifile)
 
 	parser = (t_parser *)malloc(sizeof(t_parser));
 	set_op_tab(parser);
-	list = (t_labels*)malloc(sizeof(t_labels));
+	list = NULL;
 	ofile = (char *)malloc(ft_strlen(ifile) + 2);
 	ft_strcpy(ofile, ifile);
 	ft_strcpy(&ofile[ft_strlen(ifile) - 1], "cor");
@@ -209,8 +208,8 @@ void	parse_champion(char *ifile)
 	// get rid of name and comment, then get labels
 	get_asm_line(parser);
 	get_asm_line(parser);
-	first_pass(parser, list);
-	parser->list = list->next;
+	first_pass(parser, &list);
+	parser->list = list;
 	close(parser->ifd);
 
 	// reopen to do the parsing

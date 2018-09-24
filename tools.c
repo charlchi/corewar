@@ -16,7 +16,7 @@ unsigned int	uctoi(unsigned char *pos, int bytes)
 {
 	int				i;
 	unsigned int	ret;
-	
+
 	ret = pos[0];
 	i = 1;
 	while (i < bytes)
@@ -53,9 +53,9 @@ int				is_action(t_vm *vm, unsigned char c)
 	return (0);
 }
 
-int				consume_param(unsigned char *pos, int *pc, int bytes)
+unsigned int		consume_param(unsigned char *pos, int *pc, int bytes)
 {
-	int		ret;
+	unsigned int		ret;
 
 	ret = uctoi(pos + *pc, bytes);
 	*pc += bytes;

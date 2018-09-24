@@ -60,7 +60,7 @@ void	cw_lfork(t_vm *vm, t_process *cursor)
 
 	cursor->pc++;
 	param1 = consume_param(vm->arena, &cursor->pc, 4);
-	newcursor = clone_cursor(cursor, cursor->pc - 1 + param1);
+	newcursor = clone_cursor(cursor, (cursor->pc - 1 + param1) % MEM_SIZE);
 	newcursor->carry = 0;
 	add_cursor(vm, newcursor);
 }
