@@ -13,6 +13,8 @@
 #ifndef ASSEMBLER_H
 # define ASSEMBLER_H
 
+# include <sys/types.h>
+# include <unistd.h>
 # include "../libft/libft.h"
 # include "op.h"
 
@@ -34,6 +36,7 @@ typedef struct		s_parser
 	int				program[8000];
 	int				line;
 	int				col;
+	int				size;
 }					t_parser;
 
 void		set_op_tab(t_parser *parser);

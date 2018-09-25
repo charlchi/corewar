@@ -6,7 +6,7 @@
 /*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/11 12:21:16 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/24 12:30:46 by mgerber          ###   ########.fr       */
+/*   Updated: 2018/09/25 12:22:00 by mgerber          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void		free_split(char **array)
 	int i;
 
 	i = 0;
-	while (array[i])
+	while (array && array[i])
 		free(array[i++]);
 	free(array);
 }
@@ -30,19 +30,55 @@ char	*strip_asm(char *str)
 	int		j;
 	char	*new;
 
+	if (str == NULL)
+		return (NULL);
 	i = 0;
 	j = 0;
+	if ((new = ft_strchr(str, COMMENT_CHAR)))
+		*new = '\0';
 	while ((new = ft_strchr(str, '\t')))
 		*new = ' ';
 	while (str[i] == ' ' && str[i] != '\0')
 		i++;
-	while (str[j] != COMMENT_CHAR && str[j] != '\0')
+	while (str[j] != '\0')
 		j++;
 	j--;
 	while (str[j] == ' ')
 		j--;
 	str[j + 1] = '\0';
+	printf("stripped line [%s]\n", str + i);
 	return (ft_strdup(str + i));
+}
+
+int		get_line(int fd, char **l)
+{
+	char	buf[1000];
+	int		i;
+	int		r;
+
+	ft_bzero(buf, 1000);
+	i = 0;
+	r = 0;
+	while ((r = read(fd, &buf[i], 1)) == 1)
+	{
+		if (buf[i] == '\n')
+		{
+			buf[i] = '\0';
+			*l = ft_strdup(buf);
+			printf("line[%s]\n", *l);
+			return (1);
+		}
+		i++;
+	}
+	if (i > 0)
+	{
+		buf[i] = '\0';
+		*l = ft_strdup(buf);
+		printf("line[%s]\n", *l);
+		return (1);
+	}
+	*l = NULL;
+	return (0);
 }
 
 char	*get_asm_line(t_parser *parser)
@@ -54,7 +90,7 @@ char	*get_asm_line(t_parser *parser)
 	parser->line++;
 	parser->col = 0;
 	asml = NULL;
-	if ((r = get_next_line(parser->ifd, &l) > 0))
+	if ((r = get_line(parser->ifd, &l) > 0))
 	{
 		asml = strip_asm(l);
 		free(l);
@@ -64,7 +100,7 @@ char	*get_asm_line(t_parser *parser)
 		free(asml);
 		parser->line++;
 		parser->col = 0;
-		r = get_next_line(parser->ifd, &l);
+		r = get_line(parser->ifd, &l);
 		asml = strip_asm(l);
 		free(l);
 	}

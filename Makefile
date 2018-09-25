@@ -6,12 +6,12 @@
 #    By: cmoller <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/18 13:23:13 by cmoller           #+#    #+#              #
-#    Updated: 2018/09/12 15:09:30 by cmoller          ###   ########.fr        #
+#    Updated: 2018/09/25 12:57:47 by cmoller          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME =	corewar
-FLAGS =	-Wall -Wextra -Werror
+#FLAGS =	-Wall -Wextra -Werror
 CC = gcc
 SRC = $(wildcard *.c) $(wildcard libft/*.c)
 OBJ = $(SRC:.c=.o)

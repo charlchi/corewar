@@ -1,10 +1,6 @@
 .name		"Celebration Funebre v0.99pl42"
 .comment	"Jour J"
 
-# 02
-90 0000 0000 03
-09 0050 0900 00
-
 code:
 01    0000002a
 0b 64 0f 0000 0e

@@ -21,7 +21,7 @@ int		main(int ac, char **av)
 
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(64*12, 64*12);
+	glutInitWindowSize(64*10, 64*10);
 	glutCreateWindow("corewar");
 	glDisable(GL_DEPTH_TEST);
 	glutDisplayFunc(run_vm);
@@ -45,8 +45,8 @@ int		main(int ac, char **av)
 
 void	run_vm(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//int			pixels[64 * 64];
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int			pixels[64 * 64];
 
 
 
@@ -68,7 +68,7 @@ void	run_vm(void)
 		cursor = cursor->next;
 		gg++;
 	}
-	printf("number of cursors----------------->%d\n", gg);
+	//printf("number of cursors----------------->%d\n", gg);
 	vm->total_cycles++;
 	vm->cycle--;
 	if (!vm->cycle)
@@ -82,7 +82,6 @@ void	run_vm(void)
 		vm->cycle = vm->cycle_to_die;
 	}
 
-/*
 	int i = 0;
 	while (i < 64 * 64)
 	{
@@ -98,10 +97,9 @@ void	run_vm(void)
 			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0555500;
 		cursor = cursor->next;
 	}
-*/
-	//glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
-	//glutSwapBuffers();
-	//glFlush();
+	glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
+	glutSwapBuffers();
+	glFlush();
 	//}
 	//exit_sequence(vm);
 }
