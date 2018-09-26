@@ -21,7 +21,7 @@ int		main(int ac, char **av)
 
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(64*10, 64*10);
+	glutInitWindowSize(64*4, 64*4);
 	glutCreateWindow("corewar");
 	glDisable(GL_DEPTH_TEST);
 	glutDisplayFunc(run_vm);
@@ -38,17 +38,16 @@ int		main(int ac, char **av)
 	}
 	printf("%p\n", vm.first);
 	g_vm = &vm;
-	glPixelZoom(10.0, 10.0);
+	glPixelZoom(4.0, 4.0);
 	glutMainLoop();
 	//run_vm(&vm);
 }
 
+int			pixels[64 * 64];
+
 void	run_vm(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	int			pixels[64 * 64];
-
-
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	t_process	*cursor;
 	t_vm		*vm;
@@ -59,16 +58,16 @@ void	run_vm(void)
 	int gg = 0;
 	while (cursor)
 	{
-		//printf("exec cursor %d\n", gg);
+		printf("exec cursor %d\n", gg);
 		if (!cursor->dead_flag)
 			execute_process(vm, cursor);
-		//if (cursor->pc < 0) cursor->pc = ((cursor->pc * - 1) % MEM_SIZE);
+		if (cursor->pc < 0) cursor->pc = MEM_SIZE - (cursor->pc * -1);
 		cursor->pc = cursor->pc % MEM_SIZE;
-		//printf("%d pc %d \n", gg, cursor->pc);
+		printf("%d pc %d \n", gg, cursor->pc);
 		cursor = cursor->next;
 		gg++;
 	}
-	//printf("number of cursors----------------->%d\n", gg);
+	printf("number of cursors---------------------------------->%d\n", gg);
 	vm->total_cycles++;
 	vm->cycle--;
 	if (!vm->cycle)
@@ -89,9 +88,9 @@ void	run_vm(void)
 		i++;
 	}
 	cursor = vm->first;
-	while (cursor)
+	while (cursor->next)
 	{
-		if (vm->total_cycles % 8 < 4)
+		if (vm->total_cycles % 2 == 0)
 			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0000000;
 		else 
 			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0555500;

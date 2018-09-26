@@ -12,7 +12,7 @@
 
 #include "corewar.h"
 
-void	cw_lld(t_vm *vm, t_process *cursor)
+void	cw_lld(t_vm *vm, t_process *cursor, int start)
 {
 	int	acb;
 	int param1;
@@ -28,7 +28,7 @@ void	cw_lld(t_vm *vm, t_process *cursor)
 	cursor->reg[param2] = (cursor->pc + param1) % MEM_SIZE;
 }
 
-void	cw_lldi(t_vm *vm, t_process *cursor)
+void	cw_lldi(t_vm *vm, t_process *cursor, int start)
 {
 	char	acb;
 	int		param1;
@@ -53,7 +53,7 @@ void	cw_lldi(t_vm *vm, t_process *cursor)
 		uctoi(&vm->arena[(cursor->pc + index) % MEM_SIZE], 4);
 }
 
-void	cw_lfork(t_vm *vm, t_process *cursor)
+void	cw_lfork(t_vm *vm, t_process *cursor, int start)
 {
 	t_process	*newcursor;
 	int			param1;
@@ -65,7 +65,7 @@ void	cw_lfork(t_vm *vm, t_process *cursor)
 	add_cursor(vm, newcursor);
 }
 
-void	cw_aff(t_vm *vm, t_process *cursor)
+void	cw_aff(t_vm *vm, t_process *cursor, int start)
 {
 	int param1;
 

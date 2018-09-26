@@ -37,22 +37,6 @@ void	parse_acb(t_parser *parser, char **tokens, int i)
 	parser->pc++;
 }
 
-void	bytestr(t_parser *parser, int val, int n)
-{
-	int		i;
-	unsigned int	shifted;
-
-	i = n;
-	while (i > 0)
-	{
-		shifted = 0xff << (8 * (i - 1));
-		shifted = shifted & val;
-		shifted = shifted >> (8 * (i - 1));
-		add_byte(parser, shifted);
-		i--;
-	}
-}
-
 void	parse_params(t_parser *parser, char **tokens, int i)
 {
 	int		num;

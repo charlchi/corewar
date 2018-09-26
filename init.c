@@ -200,6 +200,7 @@ void	place_player(t_champ *champ, int start, t_vm *vm)
 	champ->core = malloc(sizeof(unsigned char)*champ->p_size);
 	CHECKRETURN(read(champ->fd, champ->core, champ->p_size),
 	"Invalid instructions");
+	printf("%d\n", start);
 	ft_memcpy(&vm->arena[start], champ->core, champ->p_size);
 	ft_putstr("Loaded player succesfully\n");
 }

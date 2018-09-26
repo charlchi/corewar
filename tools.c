@@ -40,17 +40,8 @@ int				is_action(t_vm *vm, unsigned char c)
 {
 	int k;
 
-	//  Conditional jump or move depends on uninitialised value(s)
-	k = 0;
-	while (k < 16)
-	{
-		if (vm->op_tab[k].id == c)
-		{
-			printf("\n%d is_action: %s %d\n\n", k, vm->op_tab[k].name, vm->op_tab[k].cycles);
-			return (c);
-		}
-		k++;
-	}
+	if (c >= 1 && c <= 16)
+		return (c);
 	return (0);
 }
 
@@ -61,4 +52,12 @@ unsigned int		consume_param(unsigned char *pos, int *pc, int bytes)
 	ret = uctoi(pos + *pc, bytes);
 	*pc += bytes;
 	return (ret);
+}
+
+char	*acb_to_chars(unsigned char *mem, unsigned char *acb)
+{
+	acb[0] = (*mem) & 0b11000000;
+	acb[1] = (*mem) & 0b00110000;
+	acb[2] = (*mem) & 0b00001100;
+	acb[3] = 0;
 }

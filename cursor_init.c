@@ -27,7 +27,6 @@ t_process		*create_cursor(int i)
 	newcursor->pc = i;
 	newcursor->carry = 0;
 	newcursor->next = NULL;
-	newcursor->prev = NULL;
 	k = -1;
 	while (++k < REG_NUMBER)
 		newcursor->reg[k] = 0;
@@ -40,12 +39,18 @@ t_process		*create_cursor(int i)
 
 t_process		*clone_cursor(t_process *orig, int pc)
 {
+	int			k;
 	t_process	*clone;
 
 	clone = malloc(sizeof(t_process));
-	ft_memcpy((char *)clone, (char *)orig, sizeof(t_process));
-	// confirm that this ^^ works plz
+	clone->waitcycles = orig->waitcycles;
+	clone->live_flag = orig->live_flag;
+	clone->dead_flag = orig->dead_flag;
+	clone->carry = orig->carry;
 	clone->pc = pc;
+	k = -1;
+	while (++k < REG_NUMBER)
+		clone->reg[k] = orig->reg[k];	
 	clone->next = NULL;
 	return (clone);
 }

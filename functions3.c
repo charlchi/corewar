@@ -13,19 +13,25 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
-void	cw_zjmp(t_vm *vm, t_process *cursor)
+void	cw_zjmp(t_vm *vm, t_process *cursor, int start)
 {
-	unsigned int param1;
+	int param1;
 
 	cursor->pc++;
 	param1 = consume_param(vm->arena, &cursor->pc, 2);
 	//if (cursor->carry)
 	//{
-		cursor->pc = (cursor->pc + (param1 % IDX_MOD)) % MEM_SIZE;
+	printf("param for zjmp %d\n", param1);
+	printf("jump to   zjmp %d\n", (cursor->pc + (param1)) % MEM_SIZE);
+		cursor->pc = (cursor->pc - 1 + (param1)) % MEM_SIZE;
+	if (cursor->pc < 0)
+	{
+		cursor->pc = MEM_SIZE - cursor->pc;
+	}
 	//}
 }
 
-void	cw_ldi(t_vm *vm, t_process *cursor)
+void	cw_ldi(t_vm *vm, t_process *cursor, int start)
 {
 	char	acb;
 	int		param1;
@@ -43,7 +49,12 @@ void	cw_ldi(t_vm *vm, t_process *cursor)
 	int test = consume_param(vm->arena, &cursor->pc, 2);
 	printf("register %d\n", test);
 	if (((acb & 0b00001000) >> 2) == 1)
+	{
+		if (test > 15)
+			return ;
+		cursor->pc += 5;
 		param2 = cursor->reg[test];
+	}
 	else //if (((acb & 0b00000100) >> 2) == 2)
 		param2 = consume_param(vm->arena, &cursor->pc, 1);
 	param3 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
@@ -52,13 +63,12 @@ void	cw_ldi(t_vm *vm, t_process *cursor)
 		uctoi(&vm->arena[(cursor->pc + (index % IDX_MOD)) % MEM_SIZE], 4);
 }
 
-void	cw_sti(t_vm *vm, t_process *cursor)
+void	cw_sti(t_vm *vm, t_process *cursor, int start)
 {
 	char	acb;
 	int		param1;
 	int		param2;
 	int		param3;
-
 
 	cursor->pc++;
 	acb = vm->arena[cursor->pc++];
@@ -75,10 +85,10 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 	printf("%d %d %d\n", param1, param2, param3);
 	param2 += param3;
 
-	itouc(&vm->arena[param2 % MEM_SIZE], param1);
+	itouc(&vm->arena[(start + (param2 % IDX_MOD)) % MEM_SIZE], param1);
 }
 
-void	cw_fork(t_vm *vm, t_process *cursor)
+void	cw_fork(t_vm *vm, t_process *cursor, int start)
 {
 	t_process	*newcursor;
 	int			param1;

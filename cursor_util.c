@@ -12,7 +12,7 @@
 
 #include "corewar.h"
 
-static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor) = {
+static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor, int start) = {
 	cw_live, cw_ld,   cw_st,   cw_add, 
 	cw_sub,  cw_and,  cw_or,   cw_xor,
 	cw_zjmp, cw_ldi,  cw_sti,   cw_fork,
@@ -77,19 +77,20 @@ void	execute_process(t_vm *vm, t_process *cursor)
 	k = is_action(vm, vm->arena[cursor->pc]);
 	if (k)
 	{
-		printf("executing at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
-		cw_funcs[k - 1](vm, cursor);
-		printf("done, now at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
+		printf("----------------executing at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
+		if (cursor->pc < 0)
+			exit(0);
+		cw_funcs[k - 1](vm, cursor, cursor->pc);
+		printf("^^^^^^^^^^^^^^^^done, now at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
+		if (cursor->pc < 0)
+			exit(0);
 	}
 	if (!is_action(vm, vm->arena[cursor->pc]))
 	{
 		cursor->pc++;
 		return ;
 	}
-	printf("cursor->pc %d\n", cursor->pc);
-	printf("index %d apparent waitcycles %d\n", vm->arena[cursor->pc] - 1, vm->op_tab[vm->arena[cursor->pc] - 1].cycles);
 	cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc] - 1].cycles;
-	printf("exec end waitcycles %d\n", cursor->waitcycles);
 	if (cursor->waitcycles > 1000)
 		exit(0);
 }

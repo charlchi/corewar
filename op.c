@@ -44,7 +44,10 @@ void	set_op_tab(t_vm *vm)
 {
 	int	i;
 
-	i = -1;
-	while (++i < 17)
+	i = 0;
+	while (i < 17)
+	{
 		vm->op_tab[i] = op_tab[i];
+		i++;
+	}
 }
