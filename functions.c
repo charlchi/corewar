@@ -41,17 +41,25 @@ void	cw_ld(t_vm *vm, t_process *cursor, int start)
 
 	cursor->pc++;
 	acb = (char)vm_read(vm, &cursor->pc, 1);
+	printf("test %x\n", acb);
 	if (!check_acb(vm, vm->arena[start], acb))
 		return ;
+	printf("test\n");
 	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+	if (vm_read_params(vm, &cursor->pc, p, acb))
 	{
-		if (acb & 0b01000000 > 0)
+		printf("test\n");
+		if ((acb & 0b01000000) > 0)
+		{
 			p[0] = cursor->reg[p[0]];
+		}
 		index = (start + (p[0] % IDX_MOD)) % MEM_SIZE;
 		cursor->reg[p[1]] = vm_read(vm, &index, 4);
 	}
 }
+
+
+
 
 void	cw_st(t_vm *vm, t_process *cursor, int start)
 {
@@ -68,7 +76,7 @@ void	cw_st(t_vm *vm, t_process *cursor, int start)
 	{
 		if (acb == 0b01110000)
 		{
-			index = (start + (p[1] % IDX_MOD)) % MEM_SIZE;
+			index = (((start + (p[1] % IDX_MOD))) % MEM_SIZE);
 			vm_write(vm, index, cursor->reg[p[0]], 4);
 		}
 		else if (acb == 0b01010000)

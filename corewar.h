@@ -64,6 +64,7 @@ typedef struct  	s_champ
 
 typedef struct		s_vm
 {
+	int				pixels[64 * 64];
 	t_op			op_tab[16];
 	unsigned char	arena[MEM_SIZE];
 	int				num_champs;

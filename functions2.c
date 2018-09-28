@@ -39,9 +39,9 @@ void	cw_and(t_vm *vm, t_process *cursor, int start)
 	ft_bzero((void *)p, sizeof(p));
 	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (acb & 0b01000000 > 0)
+		if ((acb & 0b01000000) > 0)
 			p[0] = cursor->reg[p[0]];
-		if (acb & 0b00010000 > 0)
+		if ((acb & 0b00010000) > 0)
 			p[1] = cursor->reg[p[1]];
 		cursor->reg[p[2]] = p[0] & p[1];;
 	}
@@ -59,9 +59,9 @@ void	cw_or(t_vm *vm, t_process *cursor, int start)
 	ft_bzero((void *)p, sizeof(p));
 	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (acb & 0b01000000 > 0)
+		if ((acb & 0b01000000) > 0)
 			p[0] = cursor->reg[p[0]];
-		if (acb & 0b00010000 > 0)
+		if ((acb & 0b00010000) > 0)
 			p[1] = cursor->reg[p[1]];
 		cursor->reg[p[2]] = p[0] | p[1];;
 	}
@@ -79,9 +79,9 @@ void	cw_xor(t_vm *vm, t_process *cursor, int start)
 	ft_bzero((void *)p, sizeof(p));
 	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (acb & 0b01000000 > 0)
+		if ((acb & 0b01000000) > 0)
 			p[0] = cursor->reg[p[0]];
-		if (acb & 0b00010000 > 0)
+		if ((acb & 0b00010000) > 0)
 			p[1] = cursor->reg[p[1]];
 		cursor->reg[p[2]] = p[0] ^ p[1];;
 	}

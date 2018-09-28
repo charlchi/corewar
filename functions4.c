@@ -25,7 +25,7 @@ void	cw_lld(t_vm *vm, t_process *cursor, int start)
 	ft_bzero((void *)p, sizeof(p));
 	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (acb & 0b01000000 > 0)
+		if ((acb & 0b01000000))
 			p[0] = cursor->reg[p[0]];
 		index = (start + p[0]) % MEM_SIZE;
 		cursor->reg[p[1]] = vm_read(vm, &index, 4);
@@ -45,9 +45,9 @@ void	cw_lldi(t_vm *vm, t_process *cursor, int start)
 	ft_bzero((void *)p, sizeof(p));
 	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (acb & 0b01000000 > 0)
+		if ((acb & 0b01000000) > 0)
 			p[0] = cursor->reg[p[0]];
-		if (acb & 0b00010000 > 0)
+		if ((acb & 0b00010000) > 0)
 			p[1] = cursor->reg[p[1]];
 		index = (start + p[0] + p[1]) % MEM_SIZE;
 		cursor->reg[p[2]] = vm_read(vm, &index, 4);

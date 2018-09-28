@@ -19,13 +19,29 @@ int				check_acb(t_vm *vm, char opcode, char acb)
 
 	i = 0;
 	
-	while (i < vm->op_tab[opcode].nargs)
+	printf("inside check_acb %s\n", vm->op_tab[opcode - 1].name);
+
+	if (vm->op_tab[opcode - 1].nargs > 1)
 	{
-		code = 1 << ((acb >> ((3 - i) * 2)) & 0b00000011);
-		if (!(code & vm->op_tab[opcode].argtype[i]))
+		printf("%d\n", (vm->op_tab[opcode - 1].argtype[0] & 
+			((acb >> 6) & 0b00000011)));
+		if ((vm->op_tab[opcode - 1].argtype[0] & 
+			((acb >> 6) & 0b00000011)) == 0)
 			return (0);
-		i++;
 	}
+	if (vm->op_tab[opcode - 1].nargs > 2)
+	{
+		if ((vm->op_tab[opcode - 1].argtype[1] & 
+			((acb >> 4) & 0b00000011)) == 0)
+			return (0);
+	}
+	if (vm->op_tab[opcode - 1].nargs > 3)
+	{
+		if ((vm->op_tab[opcode - 1].argtype[2] & 
+			((acb >> 2) & 0b00000011)) == 0)
+			return (0);
+	}
+	printf("check_acb succesfull\n");
 	return (1);
 }
 
@@ -34,27 +50,33 @@ int				vm_read_params(t_vm *vm, int *pc, unsigned int *p, char acb)
 	int		size;
 
 	size = vm->op_tab[vm->arena[*(pc - 1)] - 1].label_size ? 2 : 4;
-	if (((acb & 0b11000000) >> 6) == REG_CODE)
+	if (((acb & 0b11000000) >> 6) == REG_CODE){
 		if ((p[0] = vm_read(vm, pc, 1)) > 15)
 			return (0);
+	}
 	else if (((acb & 0b11000000) >> 6) == IND_CODE)
 		p[0] = vm_read(vm, pc, 2);
 	else if (((acb & 0b11000000) >> 6) == DIR_CODE)
 		p[0] = vm_read(vm, pc, size);
 	if (((acb & 0b00110000) >> 4) == REG_CODE)
+	{
 		if ((p[1] = vm_read(vm, pc, 1)) > 15)
 			return (0);
+	}
 	else if (((acb & 0b00110000) >> 4) == IND_CODE)
 		p[1] = vm_read(vm, pc, 2);
 	else if (((acb & 0b00110000) >> 4) == DIR_CODE)
 		p[1] = vm_read(vm, pc, size);
 	if (((acb & 0b00001100) >> 2) == REG_CODE)
+	{
 		if ((p[2] = vm_read(vm, pc, 1)) > 15)
 			return (0);
+	}
 	else if (((acb & 0b00001100) >> 2) == IND_CODE)
 		p[2] = vm_read(vm, pc, 2);
 	else if (((acb & 0b00001100) >> 2) == DIR_CODE)
 		p[2] = vm_read(vm, pc, size);
+	//printf("%d %d %d\n", p[0], p[1], p[2]);
 	return (1);
 }
 
@@ -63,13 +85,13 @@ unsigned int	vm_read(t_vm *vm, int *pos, int n)
 	int				i;
 	unsigned int	ret;
 
-	ret = vm->arena[*pos % MEM_SIZE];
-	i = 1;
+	ret = 0;
+	i = 0;
 	while (i < n)
 	{
-		*pos++;
+		printf("read %d %x\n", (*pos), vm->arena[(*pos) % MEM_SIZE]);
 		ret = ret << 8;
-		ret += vm->arena[(*pos) % MEM_SIZE];
+		ret += vm->arena[(*pos)++ % MEM_SIZE];
 		i++;
 	}
 	*pos = *pos % MEM_SIZE;
@@ -136,12 +158,4 @@ unsigned int		consume_param(unsigned char *pos, int *pc, int bytes)
 	ret = uctoi(pos + *pc, bytes);
 	*pc += bytes;
 	return (ret);
-}
-
-char	*acb_to_chars(unsigned char *mem, unsigned char *acb)
-{
-	acb[0] = (*mem) & 0b11000000;
-	acb[1] = (*mem) & 0b00110000;
-	acb[2] = (*mem) & 0b00001100;
-	acb[3] = 0;
 }
