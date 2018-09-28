@@ -12,13 +12,6 @@
 
 #include "corewar.h"
 
-static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor, int start) = {
-	cw_live, cw_ld,   cw_st,   cw_add, 
-	cw_sub,  cw_and,  cw_or,   cw_xor,
-	cw_zjmp, cw_ldi,  cw_sti,   cw_fork,
-	cw_lld,  cw_lldi, cw_lfork, cw_aff
-};
-
 void	add_cursor(t_vm *vm, t_process *cursor)
 {
 	t_process		*curr;
@@ -34,6 +27,45 @@ void	add_cursor(t_vm *vm, t_process *cursor)
 			curr = curr->next;
 		curr->next = cursor;
 	}
+}
+
+t_process		*create_cursor(int i)
+{
+	int			k;
+	t_process	*newcursor;
+
+
+	newcursor = malloc(sizeof(t_process));
+	if (newcursor == NULL)
+		return (NULL);
+	newcursor->waitcycles = 0;
+	newcursor->live_flag = 0;
+	newcursor->dead_flag = 0;
+	newcursor->pc = i;
+	newcursor->carry = 0;
+	newcursor->next = NULL;
+	k = -1;
+	while (++k < REG_NUMBER)
+		newcursor->reg[k] = 0;
+	return (newcursor);
+}
+
+t_process		*clone_cursor(t_process *orig, int pc)
+{
+	int			k;
+	t_process	*clone;
+
+	clone = malloc(sizeof(t_process));
+	clone->waitcycles = orig->waitcycles;
+	clone->live_flag = orig->live_flag;
+	clone->dead_flag = orig->dead_flag;
+	clone->carry = orig->carry;
+	clone->pc = pc;
+	k = -1;
+	while (++k < REG_NUMBER)
+		clone->reg[k] = orig->reg[k];	
+	clone->next = NULL;
+	return (clone);
 }
 
 /*
@@ -66,34 +98,6 @@ void	kill_cursors(t_vm *vm)
 	}
 }
 
-void	execute_process(t_vm *vm, t_process *cursor)
-{
-	int k;
-	if (cursor->waitcycles)
-	{
-		cursor->waitcycles--;
-		return ;
-	}
-	k = is_action(vm, vm->arena[cursor->pc]);
-	if (k)
-	{
-		printf("----------------executing at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
-		if (cursor->pc < 0)
-			exit(0);
-		cw_funcs[k - 1](vm, cursor, cursor->pc);
-		printf("^^^^^^^^^^^^^^^^done, now at %d: %s\n", cursor->pc, vm->op_tab[k - 1].name);
-		if (cursor->pc < 0)
-			exit(0);
-	}
-	if (!is_action(vm, vm->arena[cursor->pc]))
-	{
-		cursor->pc++;
-		return ;
-	}
-	cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc] - 1].cycles;
-	if (cursor->waitcycles > 1000)
-		exit(0);
-}
 
 
 

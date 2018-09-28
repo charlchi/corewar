@@ -15,77 +15,56 @@
 
 void	cw_zjmp(t_vm *vm, t_process *cursor, int start)
 {
-	int param1;
+	int		p;
 
 	cursor->pc++;
-	param1 = consume_param(vm->arena, &cursor->pc, 2);
-	//if (cursor->carry)
-	//{
-	printf("param for zjmp %d\n", param1);
-	printf("jump to   zjmp %d\n", (cursor->pc + (param1)) % MEM_SIZE);
-		cursor->pc = (cursor->pc - 1 + (param1)) % MEM_SIZE;
-	if (cursor->pc < 0)
-	{
-		cursor->pc = MEM_SIZE - cursor->pc;
-	}
-	//}
+	p = vm_read(vm, &cursor->pc, 2);
+	cursor->pc = (start + p) % MEM_SIZE;
 }
 
 void	cw_ldi(t_vm *vm, t_process *cursor, int start)
 {
-	char	acb;
-	int		param1;
-	int		param2;
-	int		param3;
-	int		index;
-
-	cursor->pc++;
-	acb = vm->arena[cursor->pc++];
+	unsigned char	acb;
+	int				index;
+	int				p[3];
 	
-	if (((acb & 0b00010000) >> 4) == 1)
-		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else //if ((((acb & 0b00100000) >> 4) & 0b10) > 0)
-		param1 = consume_param(vm->arena, &cursor->pc, 2);
-	int test = consume_param(vm->arena, &cursor->pc, 2);
-	printf("register %d\n", test);
-	if (((acb & 0b00001000) >> 2) == 1)
+	cursor->pc++;
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		if (test > 15)
-			return ;
-		cursor->pc += 5;
-		param2 = cursor->reg[test];
+		if (acb & 0b01000000 > 0)
+			p[0] = cursor->reg[p[0]];
+		if (acb & 0b00010000 > 0)
+			p[1] = cursor->reg[p[1]];
+		index = ((start + p[0] + p[1]) % IDX_MOD) % MEM_SIZE;
+		cursor->reg[p[2]] = vm_read(vm, &index, 4);
 	}
-	else //if (((acb & 0b00000100) >> 2) == 2)
-		param2 = consume_param(vm->arena, &cursor->pc, 1);
-	param3 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	index = (((cursor->pc + (param1 % IDX_MOD)) % MEM_SIZE) + param2);
-	cursor->reg[param3] =
-		uctoi(&vm->arena[(cursor->pc + (index % IDX_MOD)) % MEM_SIZE], 4);
 }
 
 void	cw_sti(t_vm *vm, t_process *cursor, int start)
 {
-	char	acb;
-	int		param1;
-	int		param2;
-	int		param3;
-
+	unsigned char	acb;
+	int				index;
+	int				p[3];
+	
 	cursor->pc++;
-	acb = vm->arena[cursor->pc++];
-	param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	if (((acb & 0b00010000) >> 4) == 1)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else //if ((((acb & 0b00100000) >> 4) & 0b10) > 0)
-		param2 = consume_param(vm->arena, &cursor->pc, 2);
-	if (((acb & 0b00001000) >> 2) == 1)
-		param3 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
-	else //if (((acb & 0b00000100) >> 2) == 2)
-		param3 = consume_param(vm->arena, &cursor->pc, 1);
-	printf("pc %d\n", cursor->pc);
-	printf("%d %d %d\n", param1, param2, param3);
-	param2 += param3;
-
-	itouc(&vm->arena[(start + (param2 % IDX_MOD)) % MEM_SIZE], param1);
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+	{
+		p[0] = cursor->reg[p[0]];
+		if (acb & 0b00010000 > 0)
+			p[1] = cursor->reg[p[1]];
+		if (acb & 0b00000100 > 0)
+			p[2] = cursor->reg[p[2]];
+		index = ((start + p[1] + p[2]) % IDX_MOD) % MEM_SIZE;
+		vm_write(vm, index, p[0], 4);
+	}
 }
 
 void	cw_fork(t_vm *vm, t_process *cursor, int start)
@@ -94,8 +73,8 @@ void	cw_fork(t_vm *vm, t_process *cursor, int start)
 	int			param1;
 
 	cursor->pc++;
-	param1 = consume_param(vm->arena, &cursor->pc, 4);
-	newcursor = clone_cursor(cursor, (cursor->pc - 1 + (param1 % IDX_MOD)) % MEM_SIZE);
+	param1 = vm_read(vm, &cursor->pc, 2);
+	newcursor = clone_cursor(cursor, (start + (param1 % IDX_MOD)) % MEM_SIZE);
 	newcursor->carry = 0;
 	add_cursor(vm, newcursor);
 }

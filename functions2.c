@@ -15,90 +15,74 @@
 
 void	cw_sub(t_vm *vm, t_process *cursor, int start)
 {
-	int				param1;
-	int				param2;
-
+	unsigned char	acb;
+	int				p[3];
+	
 	cursor->pc++;
-	param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1 - param2;
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+		cursor->reg[p[2]] = cursor->reg[p[0]] - cursor->reg[p[1]];
 }
 
 void	cw_and(t_vm *vm, t_process *cursor, int start)
 {
 	unsigned char	acb;
-	int				param1;
-	int				param2;
-
+	int				p[3];
+	
 	cursor->pc++;
-	acb = vm->arena[cursor->pc++];
-	if (acb == 0b01110100 || acb == 0b01100100 || acb == 0b01010100)
-		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else // if (acb == 0b11110100 || acb == 0b11100100 || acb == 0b11010100 ||
-	//acb == 0b10110100 || acb == 0b10100100 || acb == 0b10010100)
-		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
-	if (acb == 0b01010100 || acb == 0b10010100 || acb == 0b11010100)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else //if (acb == 0b01110100 || acb == 0b10110100 || acb == 0b11110100 ||
-	//acb == 0b01100100 || acb == 0b10100100 || acb == 0b11100100)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
-	cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1 & param2;
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+	{
+		if (acb & 0b01000000 > 0)
+			p[0] = cursor->reg[p[0]];
+		if (acb & 0b00010000 > 0)
+			p[1] = cursor->reg[p[1]];
+		cursor->reg[p[2]] = p[0] & p[1];;
+	}
 }
 
 void	cw_or(t_vm *vm, t_process *cursor, int start)
 {
 	unsigned char	acb;
-	int				param1;
-	int				param2;
-
+	unsigned int	p[3];
+	
 	cursor->pc++;
-	printf("pc %d\n", cursor->pc);
-	acb = vm->arena[cursor->pc++];
-	if (acb == 0b01110100 || acb == 0b01100100 || acb == 0b01010100)
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
 	{
-		int test = consume_param(vm->arena, &cursor->pc, 1);
-		printf("reg %d\n", test);
-		param1 = cursor->reg[test];
+		if (acb & 0b01000000 > 0)
+			p[0] = cursor->reg[p[0]];
+		if (acb & 0b00010000 > 0)
+			p[1] = cursor->reg[p[1]];
+		cursor->reg[p[2]] = p[0] | p[1];;
 	}
-	else //if (acb == 0b11110100 || acb == 0b11100100 || acb == 0b11010100 ||
-	//acb == 0b10110100 || acb == 0b10100100 || acb == 0b10010100)
-	{
-		int test = consume_param(vm->arena, &cursor->pc, 2);
-		printf("reg %d\n", test);
-		param1 = test;
-	}
-	if (acb == 0b01010100 || acb == 0b10010100 || acb == 0b11010100)
-	{
-		int test = consume_param(vm->arena, &cursor->pc, 1);
-		printf("reg %d\n", test);
-		param2 = cursor->reg[test];
-	}
-	else { // if (acb == 0b01110100 || acb == 0b10110100 || acb == 0b11110100 ||
-	//acb == 0b01100100 || acb == 0b10100100 || acb == 0b11100100)
-		int test = consume_param(vm->arena, &cursor->pc, 2);
-		printf("reg %d\n", test);
-		param2 = test;
-	}
-	cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1 | param2;
 }
 
 void	cw_xor(t_vm *vm, t_process *cursor, int start)
 {
 	unsigned char	acb;
-	int				param1;
-	int				param2;
-
+	int				p[3];
+	
 	cursor->pc++;
-	acb = vm->arena[cursor->pc++];
-	if (acb == 0b01110100 || acb == 0b01100100 || acb == 0b01010100)
-		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else // if (acb == 0b11110100 || acb == 0b11100100 || acb == 0b11010100 ||
-	//acb == 0b10110100 || acb == 0b10100100 || acb == 0b10010100)
-		param1 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
-	if (acb == 0b01010100 || acb == 0b10010100 || acb == 0b11010100)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 1)];
-	else //if (acb == 0b01110100 || acb == 0b10110100 || acb == 0b11110100 ||
-	//acb == 0b01100100 || acb == 0b10100100 || acb == 0b11100100)
-		param2 = cursor->reg[consume_param(vm->arena, &cursor->pc, 2)];
-	cursor->reg[consume_param(vm->arena, &cursor->pc, 1)] = param1 ^ param2;
+	acb = (char)vm_read(vm, &cursor->pc, 1);
+	if (!check_acb(vm, vm->arena[start], acb))
+		return ;
+	ft_bzero((void *)p, sizeof(p));
+	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+	{
+		if (acb & 0b01000000 > 0)
+			p[0] = cursor->reg[p[0]];
+		if (acb & 0b00010000 > 0)
+			p[1] = cursor->reg[p[1]];
+		cursor->reg[p[2]] = p[0] ^ p[1];;
+	}
 }

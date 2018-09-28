@@ -13,7 +13,15 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
+int			pixels[64 * 64];
 t_vm	*g_vm;
+
+static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor, int start) = {
+	cw_live, cw_ld,   cw_st,   cw_add, 
+	cw_sub,  cw_and,  cw_or,   cw_xor,
+	cw_zjmp, cw_ldi,  cw_sti,   cw_fork,
+	cw_lld,  cw_lldi, cw_lfork, cw_aff
+};
 
 int		main(int ac, char **av)
 {
@@ -43,11 +51,24 @@ int		main(int ac, char **av)
 	//run_vm(&vm);
 }
 
-int			pixels[64 * 64];
+void	execute_process(t_vm *vm, t_process *cursor)
+{
+	int k;
+	if (cursor->waitcycles)
+		cursor->waitcycles--;
+	else if (!is_action(vm, vm->arena[cursor->pc]))
+		cursor->pc++;
+	else if (is_action(vm, vm->arena[cursor->pc]))
+	{
+		//printf("\t\t\t\texec %s at %d\n", vm->op_tab[vm->arena[cursor->pc] - 1].name, cursor->pc);
+		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc] - 1].cycles;
+		cw_funcs[vm->arena[cursor->pc] - 1](vm, cursor, cursor->pc);
+	}
+}
 
 void	run_vm(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	t_process	*cursor;
 	t_vm		*vm;
@@ -58,16 +79,18 @@ void	run_vm(void)
 	int gg = 0;
 	while (cursor)
 	{
-		printf("exec cursor %d\n", gg);
 		if (!cursor->dead_flag)
 			execute_process(vm, cursor);
-		if (cursor->pc < 0) cursor->pc = MEM_SIZE - (cursor->pc * -1);
+		if (cursor->pc < 0)
+		{
+			printf("cursor tooo small abort mission!!!\n");
+			cursor->pc = MEM_SIZE - (cursor->pc * -1);
+		}
 		cursor->pc = cursor->pc % MEM_SIZE;
-		printf("%d pc %d \n", gg, cursor->pc);
 		cursor = cursor->next;
 		gg++;
 	}
-	printf("number of cursors---------------------------------->%d\n", gg);
+	printf("\t\t\t\t\t\t\t\t\t\tncursors %d\n", gg);
 	vm->total_cycles++;
 	vm->cycle--;
 	if (!vm->cycle)
@@ -88,14 +111,14 @@ void	run_vm(void)
 		i++;
 	}
 	cursor = vm->first;
-	while (cursor->next)
-	{
-		if (vm->total_cycles % 2 == 0)
-			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0000000;
-		else 
-			pixels[64*64 - 1 - (cursor->pc%MEM_SIZE)] = 0xf0555500;
-		cursor = cursor->next;
-	}
+	//while (cursor->next)
+	//{
+	//	if (vm->total_cycles % 2 == 0)
+	//		pixels[64*64 - 1 - (abs(cursor->pc)%MEM_SIZE)] = 0xf0000000;
+	//	else 
+	//		pixels[64*64 - 1 - (abs(cursor->pc)%MEM_SIZE)] = 0xf0555500;
+	//	cursor = cursor->next;
+	//}
 	glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
 	glutSwapBuffers();
 	glFlush();

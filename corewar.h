@@ -75,6 +75,10 @@ typedef struct		s_vm
 	int				lives;
 }					t_vm;
 
+int					check_acb(t_vm *vm, char opcode, char acb);
+int					vm_read_params(t_vm *v, int *c, unsigned int *p, char a);
+unsigned int		vm_read(t_vm *vm, int *pos, int n);
+void				vm_write(t_vm *vm, int pos, int val, int n);
 void				run_vm(void);
 void				add_cursor(t_vm *vm, t_process *cursor);
 int					living_cursors(t_vm *vm);
