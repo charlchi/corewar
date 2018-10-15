@@ -15,7 +15,7 @@
 
 t_vm	*g_vm;
 
-static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor, int start) = {
+static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor) = {
 	cw_live, cw_ld,   cw_st,   cw_add, 
 	cw_sub,  cw_and,  cw_or,   cw_xor,
 	cw_zjmp, cw_ldi,  cw_sti,   cw_fork,
@@ -28,7 +28,7 @@ int		main(int ac, char **av)
 
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(64*10, 64*10);
+	glutInitWindowSize(64*4, 64*4);
 	glutCreateWindow("corewar");
 	glDisable(GL_DEPTH_TEST);
 	glutDisplayFunc(run_vm);
@@ -45,7 +45,7 @@ int		main(int ac, char **av)
 	}
 	//printf("%p\n", vm.first);
 	g_vm = &vm;
-	glPixelZoom(10.0, 10.0);
+	glPixelZoom(4.0, 4.0);
 	ft_putarena(vm.arena, 64 * 64);
 	glutMainLoop();
 	//run_vm(&vm);
@@ -53,18 +53,47 @@ int		main(int ac, char **av)
 
 void	execute_process(t_vm *vm, t_process *cursor)
 {
-	int k;
-	if (cursor->waitcycles)
-		cursor->waitcycles--;
-	else if (!is_action(vm, vm->arena[cursor->pc]))
-		cursor->pc++;
-	else if (is_action(vm, vm->arena[cursor->pc]))
+	//printf("exec %d waitcycles %d\n", vm->arena[cursor->pc], cursor->waitcycles);
+	int op;
+
+	op = 0;
+	while (op < 3)
 	{
-		printf("\t\t\t\texec %s at %d\n", vm->op_tab[vm->arena[cursor->pc] - 1].name, cursor->pc);
-		//printf("%d\n", vm->arena[cursor->pc] - 1);
-		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc] - 1].cycles;
-		cw_funcs[vm->arena[cursor->pc] - 1](vm, cursor, cursor->pc);
+		cursor->is_reg[op] = 0;
+		cursor->params[op] = 0;
+		op++;
 	}
+	op = vm->arena[cursor->pc];
+	if (cursor->waitcycles == 0) printf("%d %d %d %d %d %d %d %d\n",
+		vm->arena[MEM(cursor->pc+0)],
+		vm->arena[MEM(cursor->pc+1)],
+		vm->arena[MEM(cursor->pc+2)],
+		vm->arena[MEM(cursor->pc+3)],
+		vm->arena[MEM(cursor->pc+4)],
+		vm->arena[MEM(cursor->pc+5)],
+		vm->arena[MEM(cursor->pc+6)],
+		vm->arena[MEM(cursor->pc+7)]
+	);
+	if (cursor->waitcycles)
+	{
+		cursor->waitcycles--;
+	}
+	else if ((op > 0 && op < 17)
+		&& check_args(vm, &vm->op_tab[op], cursor))
+	{
+		printf("\t\t\t\texec [%s] at %d\n", vm->op_tab[op].name, cursor->start);
+		cursor->waitcycles = vm->op_tab[op].cycles;
+		printf("going into cw_funcs\n");
+		cw_funcs[op - 1](vm, cursor);
+
+	}
+	else if (!(op > 0 && op < 17))
+	{
+		printf("%d not an op\n", op);
+		cursor->pc++;
+	}
+	else
+		cursor->pc++;
 }
 
 void	run_vm(void)
@@ -76,10 +105,12 @@ void	run_vm(void)
 
 	vm = g_vm;
 
+	//printf("gg %p\n", cursor);
 	cursor = vm->first;
 	int gg = 0;
 	while (cursor)
 	{
+		//printf("cursor: %d\n", cursor->pc);
 		//printf("%d\n", cursor->pc);
 		if (!cursor->dead_flag)
 		{

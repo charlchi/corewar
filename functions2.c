@@ -13,76 +13,54 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
-void	cw_sub(t_vm *vm, t_process *cursor, int start)
+void	cw_sub(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	int				p[3];
+	int			r1;
+	int			r2;
+	int			r3;
 	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-		cursor->reg[p[2]] = cursor->reg[p[0]] - cursor->reg[p[1]];
+	r1 = cursor->params[0];
+	r2 = cursor->params[1];
+	r3 = cursor->params[2];
+	cursor->reg[r3] = cursor->reg[r1] - cursor->reg[r2];
+	cursor->carry = (cursor->reg[r3] == 0);
 }
 
-void	cw_and(t_vm *vm, t_process *cursor, int start)
+void	cw_and(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	int				p[3];
-	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000) > 0)
-			p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		cursor->reg[p[2]] = p[0] & p[1];;
-	}
+	int			reg;
+
+	reg = cursor->params[2];
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	cursor->reg[reg] = cursor->params[1] & cursor->params[1];
+	cursor->carry = (cursor->reg[reg] == 0);
 }
 
-void	cw_or(t_vm *vm, t_process *cursor, int start)
+void	cw_or(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	unsigned int	p[3];
+	int			reg;
 	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000) > 0)
-			p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		cursor->reg[p[2]] = p[0] | p[1];;
-	}
+	reg = cursor->params[2];
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	cursor->reg[reg] = cursor->params[1] | cursor->params[1];
+	cursor->carry = (cursor->reg[reg] == 0);
 }
 
-void	cw_xor(t_vm *vm, t_process *cursor, int start)
+void	cw_xor(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	int				p[3];
-	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000) > 0)
-			p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		cursor->reg[p[2]] = p[0] ^ p[1];;
-	}
+	int			reg;
+
+	reg = cursor->params[2];
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	cursor->reg[reg] = cursor->params[1] ^ cursor->params[1];
+	cursor->carry = (cursor->reg[reg] == 0);
 }

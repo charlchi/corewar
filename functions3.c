@@ -13,70 +13,62 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
-void	cw_zjmp(t_vm *vm, t_process *cursor, int start)
+void	cw_zjmp(t_vm *vm, t_process *cursor)
 {
-	int		p;
+	int			index;
 
-	cursor->pc++;
-	printf("reading zjmp thingy\n");
-	p = vm_read(vm, &cursor->pc, 2);
-	printf("zjmp %x %d\n", p, p);
-	cursor->pc = ((start + p) % IDX_MOD) % MEM_SIZE;
+	//if (cursor->carry)
+	//{
+		printf("params[0] = %d\n", cursor->params[0]);
+		printf("zjmp to %d\n", MEM(cursor->start + (cursor->params[0])));
+		cursor->pc = MEM(cursor->start + (cursor->params[0]));
+	//}
 }
 
-void	cw_ldi(t_vm *vm, t_process *cursor, int start)
+void	cw_ldi(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
+	int			index;
+	int			s;
+	int			reg;
+
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	reg = cursor->params[2];
+	index = (cursor->params[0] + cursor->params[1]);
+	index = MEM(cursor->start + (index % IDX_MOD));
+	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
+	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
+	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
+	cursor->carry = (cursor->reg[reg] == 0);
+}
+
+void	cw_sti(t_vm *vm, t_process *cursor)
+{
 	int				index;
-	int				p[3];
-	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000) > 0)
-			p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		index = ((start + p[0] + p[1]) % IDX_MOD) % MEM_SIZE;
-		cursor->reg[p[2]] = vm_read(vm, &index, 4);
-	}
+	int				reg;
+
+	reg = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	if (cursor->is_reg[2])
+		cursor->params[2] = cursor->reg[cursor->params[2]];
+	index = cursor->start + ((cursor->params[1] + cursor->params[2]));
+	vm->arena[MEM(index + 0)] = (reg & 0xff000000) >> 24;
+	vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;
+	vm->arena[MEM(index + 2)] = (reg & 0x0000ff00) >> 8;
+	vm->arena[MEM(index + 3)] = (reg & 0x000000ff) >> 0;
 }
 
-void	cw_sti(t_vm *vm, t_process *cursor, int start)
+void	cw_fork(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
 	int				index;
-	int				p[3];
-	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		if ((acb & 0b00000100) > 0)
-			p[2] = cursor->reg[p[2]];
-		index = (start + ((p[1] + p[2]) % IDX_MOD)) % MEM_SIZE;
-		vm_write(vm, index, p[0], 4);
-	}
-}
+	t_process		*newcursor;
 
-void	cw_fork(t_vm *vm, t_process *cursor, int start)
-{
-	t_process	*newcursor;
-	int			param1;
-
-	cursor->pc++;
-	param1 = vm_read(vm, &cursor->pc, 2);
-	newcursor = clone_cursor(cursor, (start + (param1 % IDX_MOD)) % MEM_SIZE);
+	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
+	newcursor = clone_cursor(cursor, index);
 	newcursor->carry = 0;
 	add_cursor(vm, newcursor);
 }

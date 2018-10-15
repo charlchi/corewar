@@ -46,10 +46,9 @@
 
 typedef char	t_arg_type;
 
-# define T_REG					1 // 0001
-# define T_DIR					2 // 0010
-# define T_IND					4 // 0100
-# define T_LAB					8 // 1000
+# define T_REG					1 // 001
+# define T_DIR					2 // 010
+# define T_IND					4 // 100
 
 # define PROG_NAME_LENGTH		(128)
 # define COMMENT_LENGTH			(2048)
@@ -64,7 +63,7 @@ typedef struct		s_op
 	int		cycles;
 	char	description[50];
 	int		acb;
-	int		label_size; // if == 1, then its 2 bytes
+	int		label_size; // if == 1, then DIR is 2 bytes
 }					t_op;
 
 #endif

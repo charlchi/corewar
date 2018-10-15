@@ -198,8 +198,11 @@ void	place_player(t_champ *champ, int start, t_vm *vm)
 	CHECKRETURN(read(champ->fd, champ->prog_comment, COMMENT_LENGTH + 4),
 	"Invalid Comment");
 	champ->core = malloc(sizeof(unsigned char)*champ->p_size);
-	CHECKRETURN(read(champ->fd, champ->core, champ->p_size),
-	"Invalid instructions");
+	int i = 0;
+	int ret = 0;
+	while ((ret = read(champ->fd, champ->core + i, 1)) > 0)
+		i++;
+	champ->p_size = i;
 	printf("%d\n", start);
 	ft_memcpy(&vm->arena[start], champ->core, champ->p_size);
 	ft_putstr("Loaded player succesfully\n");
@@ -213,6 +216,7 @@ void	load_vm(t_vm *vm)
 	player = 0;
 	while (player < vm->num_champs)
 	{
+		printf("creating one player\n");
 		vm->champs[player].start = vm->champs[player].ldnbr * (MEM_SIZE/vm->num_champs);
 		cursor = create_cursor(vm->champs[player].start);
 		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;

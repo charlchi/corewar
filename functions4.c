@@ -12,65 +12,51 @@
 
 #include "corewar.h"
 
-void	cw_lld(t_vm *vm, t_process *cursor, int start)
+void	cw_lld(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
 	int				index;
-	int				p[3];
+	int				reg;
 
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000))
-			p[0] = cursor->reg[p[0]];
-		index = (start + p[0]) % MEM_SIZE;
-		cursor->reg[p[1]] = vm_read(vm, &index, 4);
-	}
+	reg = cursor->params[1];
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	index = (cursor->start + (cursor->params[0])) % MEM_SIZE;
+	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
+	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
+	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
 }
 
-void	cw_lldi(t_vm *vm, t_process *cursor, int start)
+void	cw_lldi(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	int				index;
-	int				p[3];
-	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-	{
-		if ((acb & 0b01000000) > 0)
-			p[0] = cursor->reg[p[0]];
-		if ((acb & 0b00010000) > 0)
-			p[1] = cursor->reg[p[1]];
-		index = (start + p[0] + p[1]) % MEM_SIZE;
-		cursor->reg[p[2]] = vm_read(vm, &index, 4);
-	}
+	int			index;
+	int			s;
+	int			reg;
+
+	if (cursor->is_reg[0])
+		cursor->params[0] = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->params[1] = cursor->reg[cursor->params[1]];
+	reg = cursor->reg[cursor->params[2]];
+	index = MEM(cursor->start + (cursor->params[0] + cursor->params[1]));
+	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
+	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
+	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
+	cursor->carry = (cursor->reg[reg] == 0);
 }
 
-void	cw_lfork(t_vm *vm, t_process *cursor, int start)
+void	cw_lfork(t_vm *vm, t_process *cursor)
 {
-	t_process	*newcursor;
-	int			param1;
+	int				index;
+	t_process		*newcursor;
 
-	cursor->pc++;
-	param1 = vm_read(vm, &cursor->pc, 4);
-	newcursor = clone_cursor(cursor, (start + param1) % MEM_SIZE);
-	newcursor->carry = 0;
+	index = MEM(cursor->start + (cursor->params[0]));
+	newcursor = clone_cursor(cursor, index);
 	add_cursor(vm, newcursor);
 }
 
-void	cw_aff(t_vm *vm, t_process *cursor, int start)
+void	cw_aff(t_vm *vm, t_process *cursor)
 {
-	int param1;
-
-	cursor->pc++;
-	param1 = vm_read(vm, &cursor->pc, 1);
-	ft_putchar(cursor->reg[param1] % 256);
+	printf("%c", cursor->reg[cursor->params[0]] % 256);
 }

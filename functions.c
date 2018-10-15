@@ -13,17 +13,16 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
-void	cw_live(t_vm *vm, t_process *cursor, int start)
+void	cw_live(t_vm *vm, t_process *cursor)
 {
 	int		num;
 	int i;
 
+	printf("stuff\n");
 	i = 0;
-	cursor->pc++;
-	num = vm_read(vm, &cursor->pc, 4);
 	while (i < vm->num_champs)
 	{
-		if (vm->champs[i].number == num)
+		if (vm->champs[i].number == cursor->params[0])
 		{
 			vm->champs[i].lives++;
 			vm->champs[i].last_live = vm->total_cycles;
@@ -33,67 +32,49 @@ void	cw_live(t_vm *vm, t_process *cursor, int start)
 	cursor->live_flag = 1;
 }
 
-void	cw_ld(t_vm *vm, t_process *cursor, int start)
+void	cw_ld(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
 	int				index;
-	int				p[3];
+	int				reg;
 
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	printf("test %x\n", acb);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	printf("test\n");
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, p, acb))
-	{
-		printf("test\n");
-		if ((acb & 0b01000000) > 0)
-		{
-			p[0] = cursor->reg[p[0]];
-		}
-		index = (start + (p[0] % IDX_MOD)) % MEM_SIZE;
-		cursor->reg[p[1]] = vm_read(vm, &index, 4);
-	}
+
+	reg = cursor->params[1];
+	index = (cursor->start + (cursor->params[0] % IDX_MOD)) % MEM_SIZE;
+	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
+	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
+	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
 }
 
 
 
 
-void	cw_st(t_vm *vm, t_process *cursor, int start)
+void	cw_st(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
 	int				index;
-	int				p[3];
+	int				reg;
 
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
+	reg = cursor->reg[cursor->params[0]];
+	if (cursor->is_reg[1])
+		cursor->reg[cursor->params[1]] = reg;
+	else
 	{
-		if (acb == 0b01110000)
-		{
-			index = (((start + (p[1] % IDX_MOD))) % MEM_SIZE);
-			vm_write(vm, index, cursor->reg[p[0]], 4);
-		}
-		else if (acb == 0b01010000)
-			cursor->reg[p[1]] = cursor->reg[p[0]];
+		index = (cursor->start + (cursor->params[1] % IDX_MOD)) % MEM_SIZE;
+		vm->arena[MEM(index + 0)] = (reg & 0xff000000) >> 24;
+		vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;
+		vm->arena[MEM(index + 2)] = (reg & 0x0000ff00) >> 8;
+		vm->arena[MEM(index + 3)] = (reg & 0x000000ff) >> 0;
 	}
 }
 
-void	cw_add(t_vm *vm, t_process *cursor, int start)
+void	cw_add(t_vm *vm, t_process *cursor)
 {
-	unsigned char	acb;
-	int				p[3];
+	int			r1;
+	int			r2;
+	int			r3;
 	
-	cursor->pc++;
-	acb = (char)vm_read(vm, &cursor->pc, 1);
-	if (!check_acb(vm, vm->arena[start], acb))
-		return ;
-	ft_bzero((void *)p, sizeof(p));
-	if (vm_read_params(vm, &cursor->pc, &p[0], acb))
-		cursor->reg[p[2]] = cursor->reg[p[0]] + cursor->reg[p[1]];
+	r1 = cursor->params[0];
+	r2 = cursor->params[1];
+	r3 = cursor->params[2];
+	cursor->reg[r3] = cursor->reg[r1] + cursor->reg[r2];
 }

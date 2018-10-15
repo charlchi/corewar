@@ -32,22 +32,36 @@
 # include <stdlib.h>
 # include <stdio.h>
 
+# define BITS(x) {  printf("%d", x & 128 ? 1: 0);\
+					printf("%d", x & 64 ? 1: 0);\
+					printf("%d", x & 32 ? 1: 0);\
+					printf("%d", x & 16 ? 1: 0);\
+					printf("%d", x & 8 ? 1: 0);\
+					printf("%d", x & 4 ? 1: 0);\
+					printf("%d", x & 2 ? 1: 0);\
+					printf("%d", x & 1 ? 1: 0);\
+					printf("\n");}
+# define MEM(x) ((x) % MEM_SIZE)
+
 typedef struct		s_process
 {
+	int				start;
+	int				is_reg[3];
+	int				params[3];
 	int				waitcycles;
 	int				live_flag;
 	int				dead_flag;
 	int				pc;
 	int				carry;
-	unsigned int	reg[REG_NUMBER];
+	int				reg[REG_NUMBER];
 	void			*next;
 }					t_process;
 
 
 typedef struct  	s_champ
 {
-    unsigned char	prog_name[PROG_NAME_LENGTH+5];
-	unsigned char	prog_comment[COMMENT_LENGTH+5];
+    unsigned char	prog_name[PROG_NAME_LENGTH+4];
+	unsigned char	prog_comment[COMMENT_LENGTH+4];
 	unsigned char	size[12];
 	unsigned char	*core;
 	unsigned char	magic[4];
@@ -65,7 +79,7 @@ typedef struct  	s_champ
 typedef struct		s_vm
 {
 	int				pixels[64 * 64];
-	t_op			op_tab[16];
+	t_op			op_tab[17];
 	unsigned char	arena[MEM_SIZE];
 	int				num_champs;
 	t_champ			champs[MAX_PLAYERS];
@@ -76,10 +90,6 @@ typedef struct		s_vm
 	int				lives;
 }					t_vm;
 
-int					check_acb(t_vm *vm, char opcode, char acb);
-int					vm_read_params(t_vm *v, int *c, unsigned int *p, char a);
-unsigned int		vm_read(t_vm *vm, int *pos, int n);
-void				vm_write(t_vm *vm, int pos, int val, int n);
 void				run_vm(void);
 void				add_cursor(t_vm *vm, t_process *cursor);
 int					living_cursors(t_vm *vm);
@@ -87,26 +97,23 @@ void				kill_cursors(t_vm *vm);
 void				execute_process(t_vm *vm, t_process *cursor);
 t_process			*create_cursor(int i);
 t_process			*clone_cursor(t_process *orig, int pc);
-void				cw_live(t_vm *vm, t_process *cursor, int start);
-void				cw_ld(t_vm *vm, t_process *cursor, int start);
-void				cw_st(t_vm *vm, t_process *cursor, int start);
-void				cw_add(t_vm *vm, t_process *cursor, int start);
-void				cw_sub(t_vm *vm, t_process *cursor, int start);
-void				cw_and(t_vm *vm, t_process *cursor, int start);
-void				cw_or(t_vm *vm, t_process *cursor, int start);
-void				cw_xor(t_vm *vm, t_process *cursor, int start);
-void				cw_zjmp(t_vm *vm, t_process *cursor, int start);
-void				cw_ldi(t_vm *vm, t_process *cursor, int start);
-void				cw_sti(t_vm *vm, t_process *cursor, int start);
-void				cw_fork(t_vm *vm, t_process *cursor, int start);
-void				cw_lld(t_vm *vm, t_process *cursor, int start);
-void				cw_lldi(t_vm *vm, t_process *cursor, int start);
-void				cw_lfork(t_vm *vm, t_process *cursor, int start);
-void				cw_aff(t_vm *vm, t_process *cursor, int start);
-unsigned int		uctoi(unsigned char *pos, int bytes);
-void				itouc(unsigned char *pos, unsigned int num);
+void				cw_live(t_vm *vm, t_process *cursor);
+void				cw_ld(t_vm *vm, t_process *cursor);
+void				cw_st(t_vm *vm, t_process *cursor);
+void				cw_add(t_vm *vm, t_process *cursor);
+void				cw_sub(t_vm *vm, t_process *cursor);
+void				cw_and(t_vm *vm, t_process *cursor);
+void				cw_or(t_vm *vm, t_process *cursor);
+void				cw_xor(t_vm *vm, t_process *cursor);
+void				cw_zjmp(t_vm *vm, t_process *cursor);
+void				cw_ldi(t_vm *vm, t_process *cursor);
+void				cw_sti(t_vm *vm, t_process *cursor);
+void				cw_fork(t_vm *vm, t_process *cursor);
+void				cw_lld(t_vm *vm, t_process *cursor);
+void				cw_lldi(t_vm *vm, t_process *cursor);
+void				cw_lfork(t_vm *vm, t_process *cursor);
+void				cw_aff(t_vm *vm, t_process *cursor);
 int					is_action(t_vm *vm, unsigned char c);
-unsigned int		consume_param(unsigned char *pos, int *pc, int bytes);
 void				col_endl_fd(char *colour, char *str, int fd);
 void				col_char_fd(char *colour, char c, int fd);
 void				col_str_fd(char *colour, char *str, int fd);
@@ -122,5 +129,10 @@ void				ft_putarena(unsigned char *arena, int size);
 void				place_player(t_champ *champ, int start, t_vm *vm);
 void				load_vm(t_vm *vm);
 void				set_op_tab(t_vm *vm);
+
+int					check_args(t_vm *vm, t_op *op, t_process *cursor);
+int					check_args_nocode(t_vm *vm, t_op *op, t_process *cursor);
+int					code_size(int code, int label_size);
+int					read_arg(t_vm *vm, int pos, int code, int label_size);
 
 #endif
