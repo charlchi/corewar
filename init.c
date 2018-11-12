@@ -220,6 +220,7 @@ void	load_vm(t_vm *vm)
 		vm->champs[player].start = vm->champs[player].ldnbr * (MEM_SIZE/vm->num_champs);
 		cursor = create_cursor(vm->champs[player].start);
 		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;
+		cursor->reg[0] = 0xffffffff - player;
 		add_cursor(vm, cursor);
 		place_player(&vm->champs[player], vm->champs[player].start, vm);
 		player++;

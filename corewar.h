@@ -13,7 +13,7 @@
 #ifndef COREWAR_H
 # define COREWAR_H
 
-# include <ncurses.h> 
+# include <curses.h> 
 # include "libft/libft.h"
 # include "op.h"
 # include <stdlib.h>

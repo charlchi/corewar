@@ -51,15 +51,16 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 	int				reg;
 
 	reg = cursor->reg[cursor->params[0]];
+	//fprintf(stderr, "reg[%d] 0[%d] 1[%d] 2[%d]\n\n", reg, cursor->params[0], cursor->params[1], cursor->params[2]);
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
 	if (cursor->is_reg[2])
 		cursor->params[2] = cursor->reg[cursor->params[2]];
 	index = cursor->start + ((cursor->params[1] + cursor->params[2]));
-	vm->arena[MEM(index + 0)] = (reg & 0xff000000) >> 24;
-	vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;
-	vm->arena[MEM(index + 2)] = (reg & 0x0000ff00) >> 8;
-	vm->arena[MEM(index + 3)] = (reg & 0x000000ff) >> 0;
+	vm->arena[MEM(index + 0)] = ((reg & 0xff000000) >> 24);
+	vm->arena[MEM(index + 1)] = ((reg & 0x00ff0000) >> 16);
+	vm->arena[MEM(index + 2)] = ((reg & 0x0000ff00) >> 8);
+	vm->arena[MEM(index + 3)] = ((reg & 0x000000ff) >> 0);
 }
 
 void	cw_fork(t_vm *vm, t_process *cursor)

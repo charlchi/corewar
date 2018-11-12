@@ -42,8 +42,7 @@ int		main(int ac, char **av)
 
 void	execute_process(t_vm *vm, t_process *cursor)
 {
-	//printf("exec %d waitcycles %d\n", vm->arena[cursor->pc], cursor->waitcycles);
-	int op;
+	int		op;
 
 	op = 0;
 	while (op < 3)
@@ -53,16 +52,6 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		op++;
 	}
 	op = vm->arena[cursor->pc];
-	//if (cursor->waitcycles == 0) printf("%d %d %d %d %d %d %d %d\n",
-	//	vm->arena[MEM(cursor->pc+0)],
-	//	vm->arena[MEM(cursor->pc+1)],
-	//	vm->arena[MEM(cursor->pc+2)],
-	//	vm->arena[MEM(cursor->pc+3)],
-	//	vm->arena[MEM(cursor->pc+4)],
-	//	vm->arena[MEM(cursor->pc+5)],
-	//	vm->arena[MEM(cursor->pc+6)],
-	//	vm->arena[MEM(cursor->pc+7)]
-	//);
 	if (cursor->waitcycles)
 	{
 		cursor->waitcycles--;
@@ -70,9 +59,7 @@ void	execute_process(t_vm *vm, t_process *cursor)
 	else if ((op > 0 && op < 17)
 		&& check_args(vm, &vm->op_tab[op], cursor))
 	{
-		//printf("\t\t\t\texec [%s] at %d\n", vm->op_tab[op].name, cursor->start);
 		cursor->waitcycles = vm->op_tab[op].cycles;
-		//printf("going into cw_funcs\n");
 		cw_funcs[op - 1](vm, cursor);
 
 	}
@@ -96,13 +83,11 @@ void	run_vm(t_vm	*vm)
 	clear();
 	//intrflush(stdscr, FALSE);
 	start_color();
-	init_pair(1, COLOR_RED, COLOR_BLACK);
+	use_default_colors();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-
-
-	
 
 	int gg;
 	int cyclesgg = 1000000;
@@ -110,10 +95,11 @@ void	run_vm(t_vm	*vm)
 	int i;
 	while (cyclesgg--)
 	{
+		usleep(2000);
 		refresh();
 		erase();
 		i = 0;
-		attron(COLOR_PAIR(1));
+		//attron(COLOR_PAIR(1));
 		while (i < 64 * 64) {
 			printw("%02x ", vm->arena[i]);
 			i++;
@@ -123,16 +109,16 @@ void	run_vm(t_vm	*vm)
 				printw("\n");
 			}
 		}
-		attroff(COLOR_PAIR(1));
+		//attroff(COLOR_PAIR(1));
 
 		//printf("gg\n");
 		gg = 0;
 		cursor = vm->first;
 		while (cursor)
 		{
-			attron(COLOR_PAIR(gg%4));
+			attron(COLOR_PAIR(2+gg%3));
 			mvprintw(cursor->pc / 64, cursor->pc % 64 * 3, "xx ", 255);
-			attroff(COLOR_PAIR(gg%4));
+			attroff(COLOR_PAIR(2+gg%3));
 			mvprintw(0, 0, "");
 			if (!cursor->dead_flag)
 			{
