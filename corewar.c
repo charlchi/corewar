@@ -25,15 +25,6 @@ static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor) = {
 int		main(int ac, char **av)
 {
 	t_vm		vm;
-
-	glutInit(&ac, av);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(64*4, 64*4);
-	glutCreateWindow("corewar");
-	glDisable(GL_DEPTH_TEST);
-	glutDisplayFunc(run_vm);
-	glutIdleFunc(run_vm);
-
 	init(&vm);
 	if (ac > 1)
 	{
@@ -45,10 +36,8 @@ int		main(int ac, char **av)
 	}
 	//printf("%p\n", vm.first);
 	g_vm = &vm;
-	glPixelZoom(4.0, 4.0);
 	ft_putarena(vm.arena, 64 * 64);
-	glutMainLoop();
-	//run_vm(&vm);
+	run_vm(&vm);
 }
 
 void	execute_process(t_vm *vm, t_process *cursor)
@@ -64,16 +53,16 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		op++;
 	}
 	op = vm->arena[cursor->pc];
-	if (cursor->waitcycles == 0) printf("%d %d %d %d %d %d %d %d\n",
-		vm->arena[MEM(cursor->pc+0)],
-		vm->arena[MEM(cursor->pc+1)],
-		vm->arena[MEM(cursor->pc+2)],
-		vm->arena[MEM(cursor->pc+3)],
-		vm->arena[MEM(cursor->pc+4)],
-		vm->arena[MEM(cursor->pc+5)],
-		vm->arena[MEM(cursor->pc+6)],
-		vm->arena[MEM(cursor->pc+7)]
-	);
+	//if (cursor->waitcycles == 0) printf("%d %d %d %d %d %d %d %d\n",
+	//	vm->arena[MEM(cursor->pc+0)],
+	//	vm->arena[MEM(cursor->pc+1)],
+	//	vm->arena[MEM(cursor->pc+2)],
+	//	vm->arena[MEM(cursor->pc+3)],
+	//	vm->arena[MEM(cursor->pc+4)],
+	//	vm->arena[MEM(cursor->pc+5)],
+	//	vm->arena[MEM(cursor->pc+6)],
+	//	vm->arena[MEM(cursor->pc+7)]
+	//);
 	if (cursor->waitcycles)
 	{
 		cursor->waitcycles--;
@@ -81,91 +70,97 @@ void	execute_process(t_vm *vm, t_process *cursor)
 	else if ((op > 0 && op < 17)
 		&& check_args(vm, &vm->op_tab[op], cursor))
 	{
-		printf("\t\t\t\texec [%s] at %d\n", vm->op_tab[op].name, cursor->start);
+		//printf("\t\t\t\texec [%s] at %d\n", vm->op_tab[op].name, cursor->start);
 		cursor->waitcycles = vm->op_tab[op].cycles;
-		printf("going into cw_funcs\n");
+		//printf("going into cw_funcs\n");
 		cw_funcs[op - 1](vm, cursor);
 
 	}
 	else if (!(op > 0 && op < 17))
 	{
-		printf("%d not an op\n", op);
+		//printf("%d not an op\n", op);
 		cursor->pc++;
 	}
 	else
 		cursor->pc++;
 }
 
-void	run_vm(void)
+void	run_vm(t_vm	*vm)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	t_process	*cursor;
-	t_vm		*vm;
 
-	vm = g_vm;
+	initscr();
+	//cbreak();
+	noecho();
+	//nonl();
+	clear();
+	//intrflush(stdscr, FALSE);
+	start_color();
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);
+	init_pair(3, COLOR_GREEN, COLOR_BLACK);
+	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 
-	//printf("gg %p\n", cursor);
-	cursor = vm->first;
-	int gg = 0;
-	while (cursor)
+
+	
+
+	int gg;
+	int cyclesgg = 1000000;
+	
+	int i;
+	while (cyclesgg--)
 	{
-		//printf("cursor: %d\n", cursor->pc);
-		//printf("%d\n", cursor->pc);
-		if (!cursor->dead_flag)
-		{
-			execute_process(vm, cursor);
+		refresh();
+		erase();
+		i = 0;
+		attron(COLOR_PAIR(1));
+		while (i < 64 * 64) {
+			printw("%02x ", vm->arena[i]);
+			i++;
+			if (i != 0 && i % 64 == 0)
+			{
+				printw("%02d ", i);
+				printw("\n");
+			}
 		}
-		if (cursor->pc < 0)
-		{
-			printf("cursor tooo small abort mission!!!\n");
-			cursor->pc = MEM_SIZE - (cursor->pc * -1);
-		}
-		cursor->pc = cursor->pc % MEM_SIZE;
-		cursor = cursor->next;
-		gg++;
-	}
-	//printf("\t\t\t\t\t\t\t\t\t\tncursors %d\n", gg);
-	vm->total_cycles++;
-	vm->cycle--;
-	if (!vm->cycle)
-	{
-		//kill_cursors(vm);
-		if (vm->lives >= NBR_LIVE)
-		{
-			if (!(vm->cycle_to_die < CYCLE_DELTA))
-				vm->cycle_to_die -= CYCLE_DELTA;
-		}
-		vm->cycle = vm->cycle_to_die;
-	}
+		attroff(COLOR_PAIR(1));
 
-
-	int i = 0;
-	//while (i < 64 * 64)
-	//{
-	//	if (vm->pixels[i] != 0xf0f0f0f0)
-	//		vm->pixels[64*64 - 1 - i] = 0;
-	//	i++;
-	//}
-	//i = 0;
-	while (i < 64 * 64)
-	{
-	//	if (vm->arena[i] != 0 &&vm->pixels[i] != 0xf0f0f0f0)
-			vm->pixels[64*64 - 1 - i] = vm->arena[i] * 50000;
-		i++;
+		//printf("gg\n");
+		gg = 0;
+		cursor = vm->first;
+		while (cursor)
+		{
+			attron(COLOR_PAIR(gg%4));
+			mvprintw(cursor->pc / 64, cursor->pc % 64 * 3, "xx ", 255);
+			attroff(COLOR_PAIR(gg%4));
+			mvprintw(0, 0, "");
+			if (!cursor->dead_flag)
+			{
+				execute_process(vm, cursor);
+			}
+			if (cursor->pc < 0)
+			{
+				printf("cursor tooo small abort mission!!!\n\n\n\n");
+				cursor->pc = MEM_SIZE - (cursor->pc * -1);
+			}
+			cursor->pc = cursor->pc % MEM_SIZE;
+			cursor = cursor->next;
+			gg++;
+		}
+		//printf("\t\t\t\t\t\t\t\t\t\tncursors %d\n", gg);
+		vm->total_cycles++;
+		vm->cycle--;
+		if (!vm->cycle)
+		{
+			//kill_cursors(vm);
+			if (vm->lives >= NBR_LIVE)
+			{
+				if (!(vm->cycle_to_die < CYCLE_DELTA))
+					vm->cycle_to_die -= CYCLE_DELTA;
+			}
+			vm->cycle = vm->cycle_to_die;
+		}
 	}
-	cursor = vm->first;
-	while (cursor)
-	{
-		if (vm->total_cycles % 2 == 0)
-			vm->pixels[64*64 - 1 - (abs(cursor->pc)%MEM_SIZE)] = 0xf0000000;
-		else 
-			vm->pixels[64*64 - 1 - (abs(cursor->pc)%MEM_SIZE)] = 0xf0555500;
-		cursor = cursor->next;
-	}
-	glDrawPixels(64, 64, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, vm->pixels);
-	glutSwapBuffers();
-	glFlush();
-	//}
+	endwin();
 	//exit_sequence(vm);
 }

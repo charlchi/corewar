@@ -13,20 +13,7 @@
 #ifndef COREWAR_H
 # define COREWAR_H
 
-#ifdef __linux__
-# include <GL/gl.h>
-# include <GL/glut.h>
-# include <GL/glu.h>
-#endif
-
-#ifdef __APPLE__
-# include <OpenGL/gl.h>
-# include <OpenGL/glu.h>
-# include <GLUT/glut.h>
-#endif
-
-//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-
+# include <ncurses.h> 
 # include "libft/libft.h"
 # include "op.h"
 # include <stdlib.h>
@@ -90,7 +77,7 @@ typedef struct		s_vm
 	int				lives;
 }					t_vm;
 
-void				run_vm(void);
+void				run_vm(t_vm *vm);
 void				add_cursor(t_vm *vm, t_process *cursor);
 int					living_cursors(t_vm *vm);
 void				kill_cursors(t_vm *vm);

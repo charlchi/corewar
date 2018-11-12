@@ -15,18 +15,7 @@ NAME =	corewar
 CC = gcc
 SRC = $(wildcard *.c) $(wildcard libft/*.c)
 OBJ = $(SRC:.c=.o)
-
-ifeq ($(OS),Windows_NT)
-	LFLAGS = -lglut -lGL -lm
-else
-	UNAME_S = $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		LFLAGS = -lglut -lGL -lm
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		LFLAGS = -framework GLUT -framework OpenGL
-	endif
-endif
+LFLAGS = -lncurses
 
 %.o:		%.c
 			$(CC) $(FLAGS) -c $< -o $@

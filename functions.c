@@ -18,7 +18,6 @@ void	cw_live(t_vm *vm, t_process *cursor)
 	int		num;
 	int i;
 
-	printf("stuff\n");
 	i = 0;
 	while (i < vm->num_champs)
 	{

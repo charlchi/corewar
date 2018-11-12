@@ -19,8 +19,8 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 
 	//if (cursor->carry)
 	//{
-		printf("params[0] = %d\n", cursor->params[0]);
-		printf("zjmp to %d\n", MEM(cursor->start + (cursor->params[0])));
+		//printf("params[0] = %d\n", cursor->params[0]);
+		//printf("zjmp to %d\n", MEM(cursor->start + (cursor->params[0])));
 		cursor->pc = MEM(cursor->start + (cursor->params[0]));
 	//}
 }
