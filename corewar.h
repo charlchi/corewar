@@ -68,6 +68,7 @@ typedef struct		s_vm
 	int				pixels[64 * 64];
 	t_op			op_tab[17];
 	unsigned char	arena[MEM_SIZE];
+	unsigned char	colors[MEM_SIZE];
 	int				num_champs;
 	t_champ			champs[MAX_PLAYERS];
 	t_process		*first;
@@ -77,6 +78,7 @@ typedef struct		s_vm
 	int				lives;
 }					t_vm;
 
+void				print_vm(t_vm *vm);
 void				run_vm(t_vm *vm);
 void				add_cursor(t_vm *vm, t_process *cursor);
 int					living_cursors(t_vm *vm);
@@ -113,7 +115,7 @@ void				init(t_vm *vm);
 char				*uctohex(int byte);
 void				puthex(char byte);
 void				ft_putarena(unsigned char *arena, int size);
-void				place_player(t_champ *champ, int start, t_vm *vm);
+void				place_player(t_vm *vm, int pnum);
 void				load_vm(t_vm *vm);
 void				set_op_tab(t_vm *vm);
 

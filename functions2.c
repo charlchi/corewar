@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
 #include "corewar.h"
 
 void	cw_sub(t_vm *vm, t_process *cursor)

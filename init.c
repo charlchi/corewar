@@ -132,6 +132,7 @@ void	init(t_vm *vm)
 	vm->cycle_to_die = CYCLE_TO_DIE;
 	vm->lives = 0;
 	ft_bzero(vm->arena, MEM_SIZE);
+	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
 }
 
@@ -169,19 +170,22 @@ void	ft_putarena(unsigned char *arena, int size)
 	int index;
 
 	index = 0;
-	while (index < size)
+	while (index < MEM_SIZE)
 	{
 		puthex(arena[index]);
 		index++;
-		if (index % 32 == 0)
+		if (index % 64 == 0)
 			ft_putchar('\n');
 		else
 			ft_putchar(' ');
 	}
 }
 
-void	place_player(t_champ *champ, int start, t_vm *vm)
+void	place_player(t_vm *vm, int pnum)
 {
+	t_champ		*champ;
+
+	champ = &vm->champs[pnum];
 	champ->fd = open(champ->name, O_RDONLY);
 	if (champ->fd > 0)
 	{
@@ -201,10 +205,12 @@ void	place_player(t_champ *champ, int start, t_vm *vm)
 	int i = 0;
 	int ret = 0;
 	while ((ret = read(champ->fd, champ->core + i, 1)) > 0)
+	{
+		vm->colors[champ->start + i] = pnum + 1;
 		i++;
+	}
 	champ->p_size = i;
-	printf("%d\n", start);
-	ft_memcpy(&vm->arena[start], champ->core, champ->p_size);
+	ft_memcpy(&vm->arena[champ->start], champ->core, champ->p_size);
 	ft_putstr("Loaded player succesfully\n");
 }
 
@@ -222,7 +228,7 @@ void	load_vm(t_vm *vm)
 		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;
 		cursor->reg[0] = 0xffffffff - player;
 		add_cursor(vm, cursor);
-		place_player(&vm->champs[player], vm->champs[player].start, vm);
+		place_player(vm, player);
 		player++;
 	}
 	ft_putstr("Done load_vm\n");

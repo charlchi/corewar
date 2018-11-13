@@ -6,7 +6,6 @@ int		check_args_nocode(t_vm *vm, t_op *op, t_process *cursor)
 	int		val;
 	int		jump;
 
-	//printf("hi\n");
 	val = read_arg(vm, cursor->pc + 1, op->argtype[0], op->label_size);
 	if ((op->argtype[0] & T_REG) && (val < 0 || val > 15))
 		return (0);
@@ -14,9 +13,7 @@ int		check_args_nocode(t_vm *vm, t_op *op, t_process *cursor)
 		cursor->is_reg[0] = 1;
 	cursor->params[0] = val;
 	jump = code_size(op->argtype[0], op->label_size);
-	//printf("jumping %d\n", jump);
 	cursor->pc += jump + 1;
-	//printf("now at %d with value %d\n", cursor->pc, vm->arena[cursor->pc]);
 	return (1);
 }
 
@@ -76,7 +73,7 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 		ret += (vm->arena[MEM(pos + 1)] << 16);
 		ret += (vm->arena[MEM(pos + 0)] << 24);
 	}
-	else // if (code == T_IND || (code == T_DIR && op.label_size))
+	else
 	{
 		ret = (vm->arena[MEM(pos + 1)] << 0);
 		ret += (vm->arena[MEM(pos + 0)] << 8);

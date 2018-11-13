@@ -77,49 +77,28 @@ void	run_vm(t_vm	*vm)
 	t_process	*cursor;
 
 	initscr();
-	//cbreak();
 	noecho();
-	//nonl();
 	clear();
-	//intrflush(stdscr, FALSE);
 	start_color();
 	use_default_colors();
-	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(0, COLOR_WHITE, COLOR_RED);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
+	init_pair(5, COLOR_BLACK, COLOR_GREEN);
 
 	int gg;
 	int cyclesgg = 1000000;
 	
-	int i;
 	while (cyclesgg--)
 	{
+		print_vm(vm);
 		usleep(2000);
-		refresh();
-		erase();
-		i = 0;
-		//attron(COLOR_PAIR(1));
-		while (i < 64 * 64) {
-			printw("%02x ", vm->arena[i]);
-			i++;
-			if (i != 0 && i % 64 == 0)
-			{
-				printw("%02d ", i);
-				printw("\n");
-			}
-		}
-		//attroff(COLOR_PAIR(1));
-
-		//printf("gg\n");
 		gg = 0;
 		cursor = vm->first;
 		while (cursor)
 		{
-			attron(COLOR_PAIR(2+gg%3));
-			mvprintw(cursor->pc / 64, cursor->pc % 64 * 3, "xx ", 255);
-			attroff(COLOR_PAIR(2+gg%3));
-			mvprintw(0, 0, "");
 			if (!cursor->dead_flag)
 			{
 				execute_process(vm, cursor);
@@ -133,7 +112,6 @@ void	run_vm(t_vm	*vm)
 			cursor = cursor->next;
 			gg++;
 		}
-		//printf("\t\t\t\t\t\t\t\t\t\tncursors %d\n", gg);
 		vm->total_cycles++;
 		vm->cycle--;
 		if (!vm->cycle)
@@ -150,3 +128,35 @@ void	run_vm(t_vm	*vm)
 	endwin();
 	//exit_sequence(vm);
 }
+
+void	print_vm(t_vm *vm)
+{
+	t_process	*cursor;
+	int			i;
+
+	refresh();
+	erase();
+	i = 0;
+	while (i < 64 * 64) {
+		attron(COLOR_PAIR(vm->colors[i]));
+		printw("%02x ", vm->arena[i]);
+		attroff(COLOR_PAIR(vm->colors[i]));
+		i++;
+		if (i != 0 && i % 64 == 0)
+		{
+			printw("%02d ", i);
+			printw("\n");
+		}
+	}
+	cursor = vm->first;
+	while (cursor)
+	{
+		attron(COLOR_PAIR(5));
+		mvprintw(cursor->pc / 64, cursor->pc % 64 * 3, "%02x ", vm->arena[i]);
+		attroff(COLOR_PAIR(5));
+		mvprintw(0, 0, "");
+		cursor = cursor->next;
+	}
+}
+
+
