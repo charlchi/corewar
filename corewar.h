@@ -28,7 +28,7 @@
 					printf("%d", x & 2 ? 1: 0);\
 					printf("%d", x & 1 ? 1: 0);\
 					printf("\n");}
-# define MEM(x) ((x) % MEM_SIZE)
+# define MEM(x) (x >= 0 ? (x % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
 
 typedef struct		s_process
 {
@@ -65,7 +65,6 @@ typedef struct  	s_champ
 
 typedef struct		s_vm
 {
-	int				pixels[64 * 64];
 	t_op			op_tab[17];
 	unsigned char	arena[MEM_SIZE];
 	unsigned char	colors[MEM_SIZE];
@@ -112,7 +111,6 @@ void				ft_putarr_fd(char **arr, int fd);
 int					ft_contains(char *whole, char *part);
 void 				count_champs(t_vm *vm, int ac, char **av);
 void				init(t_vm *vm);
-char				*uctohex(int byte);
 void				puthex(char byte);
 void				ft_putarena(unsigned char *arena, int size);
 void				place_player(t_vm *vm, int pnum);

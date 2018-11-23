@@ -23,7 +23,8 @@ void	cw_live(t_vm *vm, t_process *cursor)
 		if (vm->champs[i].number == cursor->params[0])
 		{
 			vm->champs[i].lives++;
-			vm->champs[i].last_live = vm->total_cycles;
+			vm->lives++;
+			vm->champs[i].last_live = vm->total_cycles; 
 		}
 		i++;
 	}
@@ -37,11 +38,8 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 
 
 	reg = cursor->params[1];
-	index = (cursor->start + (cursor->params[0] % IDX_MOD));
-	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
-	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
-	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
-	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
+	cursor->reg[reg] = cursor->params[0];
+	cursor->carry = !(cursor->reg[reg]);
 }
 
 void	cw_st(t_vm *vm, t_process *cursor)
@@ -54,15 +52,20 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		cursor->reg[cursor->params[1]] = reg;
 	else
 	{
+		//fprintf(stderr, "__st__ at %d\n\r", cursor->start);
+		//fprintf(stderr, "[0 %x]", vm->arena[MEM(index + 0)]);
+		//fprintf(stderr, "[1 %x]", vm->arena[MEM(index + 1)]);
+		//fprintf(stderr, "[2 %x]", vm->arena[MEM(index + 2)]);
+		//fprintf(stderr, "[3 %x]\n\r", vm->arena[MEM(index + 3)]);
 		index = (cursor->start + ((signed short)cursor->params[1] % IDX_MOD));
 		vm->arena[MEM(index + 0)] = (reg & 0xff000000) >> 24;
 		vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;
 		vm->arena[MEM(index + 2)] = (reg & 0x0000ff00) >> 8;
 		vm->arena[MEM(index + 3)] = (reg & 0x000000ff) >> 0;
-		vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start - 1)];
-		vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start - 1)];
-		vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start - 1)];
-		vm->colors[MEM(index + 3)] = vm->colors[MEM(cursor->start - 1)];
+		vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start)];
+		vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start)];
+		vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start)];
+		vm->colors[MEM(index + 3)] = vm->colors[MEM(cursor->start)];
 	}
 }
 
@@ -76,4 +79,5 @@ void	cw_add(t_vm *vm, t_process *cursor)
 	r2 = cursor->params[1];
 	r3 = cursor->params[2];
 	cursor->reg[r3] = cursor->reg[r1] + cursor->reg[r2];
+	cursor->carry = !(cursor->reg[r3]);
 }

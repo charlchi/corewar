@@ -60,6 +60,7 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		&& check_args(vm, &vm->op_tab[op], cursor))
 	{
 		cursor->waitcycles = vm->op_tab[op].cycles;
+		//fprintf(stderr, "%s ", vm->op_tab[op].name);
 		cw_funcs[op - 1](vm, cursor);
 
 	}
@@ -93,27 +94,26 @@ void	run_vm(t_vm	*vm)
 	
 	while (cyclesgg--)
 	{
+		refresh();
+		erase();
 		print_vm(vm);
+		mvprintw(66, 0, "%10d cycle", vm->cycle);
+		mvprintw(67, 0, "%10d total_cycles", vm->total_cycles);
+		mvprintw(68, 0, "%10d lives", vm->lives);
+		mvprintw(69, 0, "%10d cycle_to_die", vm->cycle_to_die);
 		usleep(2000);
 		gg = 0;
 		cursor = vm->first;
 		while (cursor)
 		{
 			if (!cursor->dead_flag)
-			{
 				execute_process(vm, cursor);
-			}
 			if (cursor->pc < 0)
-			{
-				printf("cursor tooo small abort mission!!!\n\n\n\n");
 				cursor->pc = MEM_SIZE - (cursor->pc * -1);
-			}
 			cursor->pc = cursor->pc % MEM_SIZE;
 			cursor = cursor->next;
 			gg++;
 		}
-		vm->total_cycles++;
-		vm->cycle--;
 		if (!vm->cycle)
 		{
 			//kill_cursors(vm);
@@ -124,6 +124,9 @@ void	run_vm(t_vm	*vm)
 			}
 			vm->cycle = vm->cycle_to_die;
 		}
+		vm->total_cycles++;
+		vm->cycle--;
+		
 	}
 	endwin();
 	//exit_sequence(vm);
@@ -134,17 +137,17 @@ void	print_vm(t_vm *vm)
 	t_process	*cursor;
 	int			i;
 
-	refresh();
-	erase();
 	i = 0;
+	printw("\n");
 	while (i < 64 * 64) {
+		printw(" ");
 		attron(COLOR_PAIR(vm->colors[i]));
-		printw("%02x ", vm->arena[i]);
+		printw("%02x", vm->arena[i]);
 		attroff(COLOR_PAIR(vm->colors[i]));
 		i++;
 		if (i != 0 && i % 64 == 0)
 		{
-			printw("%02d ", i);
+			printw(" %02", i);
 			printw("\n");
 		}
 	}
@@ -152,7 +155,7 @@ void	print_vm(t_vm *vm)
 	while (cursor)
 	{
 		attron(COLOR_PAIR(5));
-		mvprintw(cursor->pc / 64, cursor->pc % 64 * 3, "%02x ", vm->arena[i]);
+		mvprintw(cursor->pc / 64, 1 + (cursor->pc % 64 * 3), "%02x", vm->arena[i]);
 		attroff(COLOR_PAIR(5));
 		mvprintw(0, 0, "");
 		cursor = cursor->next;

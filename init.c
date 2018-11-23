@@ -12,7 +12,7 @@
 
 #include "corewar.h"
 
-#define CHECKRETURN(read, str) if((read) < 1)ERROR(str)
+#define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) ERROR(str)
 #define ERROR(str) (col_endl_fd(FRED, str, 1),exit(0))
 
 /********** AGABRIE LIBFT STUFF *******************/
@@ -136,28 +136,6 @@ void	init(t_vm *vm)
 	set_op_tab(vm);
 }
 
-char	*uctohex(int byte)
-{
-	char	*hex;
-	char	*hex_p;
-	int		temp;
-
-	hex = "\0\0\0";
-	hex_p = hex;
-	temp = byte / 16;
-	if (temp < 10)
-		*hex_p = 48 + temp;
-	else
-		*hex_p = 55 + 32 + temp;
-	hex_p++;
-	temp = byte % 16;
-	if (temp < 10)
-		*hex_p = 48 + temp;
-	else
-		*hex_p = 55 + 32 + temp;
-	return(hex);
-}
-
 void	puthex(char byte)
 {
 	char		hex[17] = "0123456789abcdef";
@@ -183,53 +161,52 @@ void	ft_putarena(unsigned char *arena, int size)
 
 void	place_player(t_vm *vm, int pnum)
 {
-	t_champ		*champ;
+	int			i;
+	int			ret;
+	t_champ		*ch;
 
-	champ = &vm->champs[pnum];
-	champ->fd = open(champ->name, O_RDONLY);
-	if (champ->fd > 0)
-	{
-		col_str_fd(FGRN, "champion exists : ", 1);
-		col_endl_fd(FCYN, champ->name, 1);
-	}
+	ch = &vm->champs[pnum];
+	ch->fd = open(ch->name, O_RDONLY);
+	if (ch->fd > 0)
+		col_str_fd(FGRN, "champion exists : \n", 1);
 	else
 		exit(1);
-	CHECKRETURN(read(champ->fd, champ->magic, 4),"Magic Invalid");
-	CHECKRETURN(read(champ->fd, champ->prog_name, PROG_NAME_LENGTH - 4),
-	"Invalid program name");
-	CHECKRETURN(read(champ->fd, champ->size, 12), "Invalid program size");
-	champ->p_size = (champ->size[11] + ((int)champ->size[10] << 8) + 1);
-	CHECKRETURN(read(champ->fd, champ->prog_comment, COMMENT_LENGTH + 4),
-	"Invalid Comment");
-	champ->core = malloc(sizeof(unsigned char)*champ->p_size);
-	int i = 0;
-	int ret = 0;
-	while ((ret = read(champ->fd, champ->core + i, 1)) > 0)
-	{
-		vm->colors[champ->start + i] = pnum + 1;
+	READ_ERR(ch->fd, ch->magic, 4,"Exec Magic Incomplete");
+	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
+	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
+	READ_ERR(ch->fd, ch->prog_comment, COMMENT_LENGTH + 4, "Invalid Comment");
+	ch->p_size = (ch->size[11] + ((int)ch->size[10] << 8) + 1);
+	ch->core = malloc(sizeof(unsigned char) * ch->p_size);
+	i = 0;
+	while ((ret = read(ch->fd, ch->core + i, 1)) > 0) {
+		vm->colors[ch->start + i] = pnum + 1;
 		i++;
 	}
-	champ->p_size = i;
-	ft_memcpy(&vm->arena[champ->start], champ->core, champ->p_size);
+	ch->p_size = i;
+	ft_memcpy(&vm->arena[ch->start], ch->core, ch->p_size);
 	ft_putstr("Loaded player succesfully\n");
 }
 
 void	load_vm(t_vm *vm)
 {
-	int			player;
-	t_process	*cursor;
+	int			i;
+	int			p;
+	t_process	*cur;
 
-	player = 0;
-	while (player < vm->num_champs)
+	p = 0;
+	while (p < vm->num_champs)
 	{
 		printf("creating one player\n");
-		vm->champs[player].start = vm->champs[player].ldnbr * (MEM_SIZE/vm->num_champs);
-		cursor = create_cursor(vm->champs[player].start);
-		cursor->waitcycles = vm->op_tab[vm->arena[cursor->pc]].cycles;
-		cursor->reg[0] = 0xffffffff - player;
-		add_cursor(vm, cursor);
-		place_player(vm, player);
-		player++;
+		vm->champs[p].start = vm->champs[p].ldnbr * (MEM_SIZE/vm->num_champs);
+		cur = create_cursor(vm->champs[p].start);
+		cur->waitcycles = vm->op_tab[vm->arena[cur->pc]].cycles;
+		cur->reg[0] = 0xffffffff - p;
+		i = 1;
+		while (i < 16)
+			cur->reg[i++] = 0;
+		add_cursor(vm, cur);
+		place_player(vm, p);
+		p++;
 	}
 	ft_putstr("Done load_vm\n");
 }

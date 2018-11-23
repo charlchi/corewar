@@ -39,11 +39,11 @@ void	cw_lldi(t_vm *vm, t_process *cursor)
 		cursor->params[1] = cursor->reg[cursor->params[1]];
 	reg = cursor->reg[cursor->params[2]];
 	index = MEM(cursor->start + (cursor->params[0] + cursor->params[1]));
-	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	cursor->reg[reg] = (vm->arena[MEM(index + 3) << 0]);
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
 	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
-	cursor->carry = (cursor->reg[reg] == 0);
+	cursor->carry = (cursor->reg[reg] == 0) ? 1 : 0;
 }
 
 void	cw_lfork(t_vm *vm, t_process *cursor)

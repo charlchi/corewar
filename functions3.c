@@ -17,11 +17,7 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 	int			index;
 
 	if (cursor->carry)
-	{
-		//printf("params[0] = %d\n", cursor->params[0]);
-		//printf("zjmp to %d\n", MEM(cursor->start + (cursor->params[0])));
-		cursor->pc = MEM(cursor->start + (cursor->params[0]));
-	}
+		cursor->pc = MEM(cursor->start + ((signed short)cursor->params[0] % IDX_MOD));
 }
 
 void	cw_ldi(t_vm *vm, t_process *cursor)
@@ -35,13 +31,13 @@ void	cw_ldi(t_vm *vm, t_process *cursor)
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
 	reg = cursor->params[2];
-	index = (cursor->params[0] + cursor->params[1]);
-	index = MEM(cursor->start + (index % IDX_MOD));
+	index = (cursor->params[0] + cursor->params[1]) % IDX_MOD;
+	index = MEM(cursor->start + index);
 	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
 	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
-	cursor->carry = (cursor->reg[reg] == 0);
+	cursor->carry = !(cursor->reg[reg]);
 }
 
 void	cw_sti(t_vm *vm, t_process *cursor)
