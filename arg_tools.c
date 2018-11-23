@@ -58,6 +58,7 @@ int		code_size(int code, int label_size)
 	return (0);
 }
 
+
 int		read_arg(t_vm *vm, int pos, int code, int label_size)
 {
 	int		ret;
@@ -77,6 +78,7 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 	{
 		ret = (vm->arena[MEM(pos + 1)] << 0);
 		ret += (vm->arena[MEM(pos + 0)] << 8);
+		ret = (short)ret;
 	}	
 	return (ret);
 }

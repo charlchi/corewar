@@ -16,8 +16,9 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 {
 	int			index;
 
+	index = MEM(cursor->start + ((signed short)cursor->params[0] % IDX_MOD));
 	if (cursor->carry)
-		cursor->pc = MEM(cursor->start + ((signed short)cursor->params[0] % IDX_MOD));
+		cursor->pc = index;
 }
 
 void	cw_ldi(t_vm *vm, t_process *cursor)
@@ -32,8 +33,8 @@ void	cw_ldi(t_vm *vm, t_process *cursor)
 		cursor->params[1] = cursor->reg[cursor->params[1]];
 	reg = cursor->params[2];
 	index = (cursor->params[0] + cursor->params[1]) % IDX_MOD;
-	index = MEM(cursor->start + index);
-	cursor->reg[reg] = vm->arena[MEM(index + 3) << 0];
+	index = MEM(cursor->start + 2 + index);
+	cursor->reg[reg] = vm->arena[MEM(index + 3)] << 0;
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
 	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
@@ -50,7 +51,8 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 		cursor->params[1] = cursor->reg[cursor->params[1]];
 	if (cursor->is_reg[2])
 		cursor->params[2] = cursor->reg[cursor->params[2]];
-	index = cursor->start + (cursor->params[1] + cursor->params[2]);
+	index = (cursor->params[1] + cursor->params[2]) % IDX_MOD;
+	index = MEM(cursor->start + 2 + index);
 	vm->arena[MEM(index + 0)] = ((reg & 0xff000000) >> 24);
 	vm->arena[MEM(index + 1)] = ((reg & 0x00ff0000) >> 16);
 	vm->arena[MEM(index + 2)] = ((reg & 0x0000ff00) >> 8);

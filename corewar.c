@@ -75,6 +75,7 @@ void	execute_process(t_vm *vm, t_process *cursor)
 
 void	run_vm(t_vm	*vm)
 {
+	int cyclesgg = 1000000;
 	t_process	*cursor;
 
 	initscr();
@@ -88,10 +89,11 @@ void	run_vm(t_vm	*vm)
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_BLACK, COLOR_GREEN);
-
-	int gg;
-	int cyclesgg = 1000000;
 	
+	//fprintf(stderr, "%d total\n", vm->total_cycles);
+	//fprintf(stderr, "%d cycle\n", vm->cycle);
+	vm->cycle = 1200;
+
 	while (cyclesgg--)
 	{
 		refresh();
@@ -101,28 +103,27 @@ void	run_vm(t_vm	*vm)
 		mvprintw(67, 0, "%10d total_cycles", vm->total_cycles);
 		mvprintw(68, 0, "%10d lives", vm->lives);
 		mvprintw(69, 0, "%10d cycle_to_die", vm->cycle_to_die);
-		usleep(2000);
-		gg = 0;
+		//usleep(2000);
 		cursor = vm->first;
 		while (cursor)
 		{
 			if (!cursor->dead_flag)
 				execute_process(vm, cursor);
-			if (cursor->pc < 0)
-				cursor->pc = MEM_SIZE - (cursor->pc * -1);
+			//if (cursor->pc < 0)
+			//	cursor->pc = MEM_SIZE - (cursor->pc * -1);
 			cursor->pc = cursor->pc % MEM_SIZE;
+			cursor->start = cursor->pc;
 			cursor = cursor->next;
-			gg++;
 		}
 		if (!vm->cycle)
 		{
-			//kill_cursors(vm);
 			if (vm->lives >= NBR_LIVE)
 			{
 				if (!(vm->cycle_to_die < CYCLE_DELTA))
 					vm->cycle_to_die -= CYCLE_DELTA;
 			}
 			vm->cycle = vm->cycle_to_die;
+			kill_cursors(vm);
 		}
 		vm->total_cycles++;
 		vm->cycle--;
@@ -152,12 +153,13 @@ void	print_vm(t_vm *vm)
 		}
 	}
 	cursor = vm->first;
-	while (cursor)
-	{
-		attron(COLOR_PAIR(5));
-		mvprintw(cursor->pc / 64, 1 + (cursor->pc % 64 * 3), "%02x", vm->arena[i]);
-		attroff(COLOR_PAIR(5));
-		mvprintw(0, 0, "");
+	while (cursor) {
+		if (!cursor->dead_flag) {
+			attron(COLOR_PAIR(5));
+			mvprintw(1 + cursor->start / 64, 1 + (cursor->start % 64 * 3), "%02x", vm->arena[cursor->start]);
+			attroff(COLOR_PAIR(5));
+			mvprintw(0, 0, "");
+		}
 		cursor = cursor->next;
 	}
 }
