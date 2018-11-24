@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functions3.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/20 13:52:41 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:19:50 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:58:07 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:58:09 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 {
 	int			index;
 
+	(void)vm;
 	index = MEM(cursor->start + ((signed short)cursor->params[0] % IDX_MOD));
 	if (cursor->carry)
 		cursor->pc = index;
@@ -24,7 +25,6 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 void	cw_ldi(t_vm *vm, t_process *cursor)
 {
 	int			index;
-	int			s;
 	int			reg;
 
 	if (cursor->is_reg[0])
@@ -52,7 +52,7 @@ void	cw_sti(t_vm *vm, t_process *cursor)
 	if (cursor->is_reg[2])
 		cursor->params[2] = cursor->reg[cursor->params[2]];
 	index = (cursor->params[1] + cursor->params[2]) % IDX_MOD;
-	index = MEM(cursor->start + 2 + index);
+	index = MEM(cursor->start + index);
 	vm->arena[MEM(index + 0)] = ((reg & 0xff000000) >> 24);
 	vm->arena[MEM(index + 1)] = ((reg & 0x00ff0000) >> 16);
 	vm->arena[MEM(index + 2)] = ((reg & 0x0000ff00) >> 8);
@@ -68,6 +68,7 @@ void	cw_fork(t_vm *vm, t_process *cursor)
 	int				index;
 	t_process		*newcursor;
 
+	(void)vm;
 	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
 	newcursor = clone_cursor(cursor, index);
 	newcursor->carry = 0;

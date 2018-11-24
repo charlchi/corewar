@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functions4.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/21 09:00:46 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:10:19 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:58:14 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:58:15 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	cw_lld(t_vm *vm, t_process *cursor)
 {
 	int				index;
 	int				reg;
-
 
 	reg = cursor->params[1];
 	index = MEM(cursor->start + 2 + (cursor->params[0]));
@@ -30,7 +29,6 @@ void	cw_lld(t_vm *vm, t_process *cursor)
 void	cw_lldi(t_vm *vm, t_process *cursor)
 {
 	int			index;
-	int			s;
 	int			reg;
 
 	if (cursor->is_reg[0])
@@ -58,5 +56,6 @@ void	cw_lfork(t_vm *vm, t_process *cursor)
 
 void	cw_aff(t_vm *vm, t_process *cursor)
 {
+	(void)vm;
 	printf("%c", cursor->reg[cursor->params[0]] % 256);
 }

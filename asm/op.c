@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   op.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2013/10/04 11:43:01 by zaz               #+#    #+#             */
-/*   Updated: 2018/09/24 11:55:40 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:26:06 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:26:09 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "op.h"
 #include "assembler.h"
 
-static t_op    op_tab[17] =
+static t_op		g_op_tab[17] =
 {
 	{"live", 1, {T_DIR}, 1, 10, "alive", 0, 0},
 	{"ld", 2, {T_DIR | T_IND, T_REG}, 2, 5, "load", 1, 0},
@@ -39,11 +39,11 @@ static t_op    op_tab[17] =
 	{"aff", 1, {T_REG}, 16, 2, "aff", 1, 0},
 };
 
-void	set_op_tab(t_parser *parser)
+void			set_op_tab(t_parser *parser)
 {
 	int	i;
 
 	i = -1;
 	while (++i < 17)
-		parser->op_tab[i] = op_tab[i];
+		parser->op_tab[i] = g_op_tab[i];
 }

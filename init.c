@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agabrie <agabrie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/11 11:30:58 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:56:55 by agabrie          ###   ########.fr       */
+/*   Created: 2018/11/24 17:01:09 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 17:01:20 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 
 #define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) ERROR(str)
 #define ERROR(str) (col_endl_fd(FRED, str, 1),exit(0))
-
-/********** AGABRIE LIBFT STUFF *******************/
-
 #define RSET "\033[00m"
 #define FBLK "\033[30m"
 #define FRED "\033[31m"
@@ -45,7 +42,7 @@ void	col_str_fd(char *colour, char *str, int fd)
 	ft_putstr_fd(RSET, fd);
 }
 
-void			ft_nbrendl_fd(int nbr, int fd)
+void	ft_nbrendl_fd(int nbr, int fd)
 {
 	ft_putnbr_fd(nbr, fd);
 	ft_putchar_fd('\n', fd);
@@ -58,7 +55,7 @@ void	ft_nbrendl(int nbr)
 
 void	ft_putarr_fd(char **arr, int fd)
 {
-	int i;
+	int		i;
 
 	i = 0;
 	while (arr[i] != '\0')
@@ -67,9 +64,9 @@ void	ft_putarr_fd(char **arr, int fd)
 
 int		ft_contains(char *whole, char *part)
 {
-	int i;
-	int j;
-	int valid;
+	int		i;
+	int		j;
+	int		valid;
 
 	i = -1;
 	j = 0;
@@ -89,12 +86,13 @@ int		ft_contains(char *whole, char *part)
 	return (0);
 }
 
-/********************END***********************/
-
-void count_champs(t_vm *vm, int ac, char **av)
+void	count_champs(t_vm *vm, int ac, char **av)
 {
-	int i = 1;
-	int fd = 0;
+	int		i;
+	int		fd;
+
+	i = 1;
+	fd = 0;
 	while (i < ac)
 	{
 		if (ft_contains(av[i], ".cor"))
@@ -120,7 +118,6 @@ void count_champs(t_vm *vm, int ac, char **av)
 		}
 		i++;
 	}
-	printf("number of champs %d\n", vm->num_champs);
 }
 
 void	init(t_vm *vm)
@@ -138,15 +135,18 @@ void	init(t_vm *vm)
 
 void	puthex(char byte)
 {
-	char		hex[17] = "0123456789abcdef";
+	char		*hex;
+
+	hex = "0123456789abcdef";
 	ft_putchar(hex[(byte & 0xf0) >> 4]);
 	ft_putchar(hex[(byte & 0x0f)]);
 }
 
 void	ft_putarena(unsigned char *arena, int size)
 {
-	int index;
+	int			index;
 
+	(void)size;
 	index = 0;
 	while (index < MEM_SIZE)
 	{
@@ -171,14 +171,15 @@ void	place_player(t_vm *vm, int pnum)
 		col_str_fd(FGRN, "champion exists : \n", 1);
 	else
 		exit(1);
-	READ_ERR(ch->fd, ch->magic, 4,"Exec Magic Incomplete");
+	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
 	READ_ERR(ch->fd, ch->prog_comment, COMMENT_LENGTH + 4, "Invalid Comment");
 	ch->p_size = (ch->size[11] + ((int)ch->size[10] << 8) + 1);
 	ch->core = malloc(sizeof(unsigned char) * ch->p_size);
 	i = 0;
-	while ((ret = read(ch->fd, ch->core + i, 1)) > 0) {
+	while ((ret = read(ch->fd, ch->core + i, 1)) > 0)
+	{
 		vm->colors[ch->start + i] = pnum + 1;
 		i++;
 	}
@@ -197,7 +198,7 @@ void	load_vm(t_vm *vm)
 	while (p < vm->num_champs)
 	{
 		printf("creating one player\n");
-		vm->champs[p].start = vm->champs[p].ldnbr * (MEM_SIZE/vm->num_champs);
+		vm->champs[p].start = vm->champs[p].ldnbr * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = vm->op_tab[vm->arena[cur->pc]].cycles;
 		cur->reg[0] = 0xffffffff - p;

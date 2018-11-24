@@ -29,6 +29,7 @@
 					printf("%d", x & 1 ? 1: 0);\
 					printf("\n");}
 # define MEM(x) (x >= 0 ? (x % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
+# define IDX(x) (x >= 0 ? (x % IDX_MOD) : -((abs(x) % IDX_MOD)))
 
 typedef struct		s_process
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functions2.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/20 13:52:41 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:10:19 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:58:00 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:58:02 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void	cw_sub(t_vm *vm, t_process *cursor)
 	int			r1;
 	int			r2;
 	int			r3;
-	
+
+	(void)vm;
 	r1 = cursor->params[0];
 	r2 = cursor->params[1];
 	r3 = cursor->params[2];
@@ -29,6 +30,7 @@ void	cw_and(t_vm *vm, t_process *cursor)
 {
 	int			reg;
 
+	(void)vm;
 	reg = cursor->params[2];
 	if (cursor->is_reg[0])
 		cursor->params[0] = cursor->reg[cursor->params[0]];
@@ -41,7 +43,8 @@ void	cw_and(t_vm *vm, t_process *cursor)
 void	cw_or(t_vm *vm, t_process *cursor)
 {
 	int			reg;
-	
+
+	(void)vm;
 	reg = cursor->params[2];
 	if (cursor->is_reg[0])
 		cursor->params[0] = cursor->reg[cursor->params[0]];
@@ -55,6 +58,7 @@ void	cw_xor(t_vm *vm, t_process *cursor)
 {
 	int			reg;
 
+	(void)vm;
 	reg = cursor->params[2];
 	if (cursor->is_reg[0])
 		cursor->params[0] = cursor->reg[cursor->params[0]];

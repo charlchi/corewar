@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   cursor_util.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/21 09:17:38 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:17:48 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:53:42 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:53:44 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "corewar.h"
 
-void	add_cursor(t_vm *vm, t_process *cursor)
+void			add_cursor(t_vm *vm, t_process *cursor)
 {
-	t_process		*curr;
-	
+	t_process	*curr;
+
 	if (vm->first == NULL)
 	{
 		vm->first = cursor;
@@ -33,7 +33,6 @@ t_process		*create_cursor(int i)
 {
 	int			k;
 	t_process	*newcursor;
-
 
 	newcursor = malloc(sizeof(t_process));
 	if (newcursor == NULL)
@@ -63,7 +62,7 @@ t_process		*clone_cursor(t_process *orig, int pc)
 	clone->pc = pc;
 	k = -1;
 	while (++k < REG_NUMBER)
-		clone->reg[k] = orig->reg[k];	
+		clone->reg[k] = orig->reg[k];
 	clone->next = NULL;
 	return (clone);
 }
@@ -84,9 +83,10 @@ int		living_cursors(t_vm *vm)
 		cursors = cursors->next;
 	}
 	return (i);
-}*/
+}
+*/
 
-void	kill_cursors(t_vm *vm)
+void			kill_cursors(t_vm *vm)
 {
 	t_process	*cursors;
 
@@ -97,16 +97,3 @@ void	kill_cursors(t_vm *vm)
 		cursors = cursors->next;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

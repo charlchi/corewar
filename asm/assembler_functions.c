@@ -3,20 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   assembler_functions.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/11 12:21:16 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/25 12:22:00 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:38:32 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:38:39 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "assembler.h"
-
 #include <stdio.h>
 
-void	bytestr(t_parser *parser, int val, int n)
+void		bytestr(t_parser *parser, int val, int n)
 {
-	int		i;
+	int				i;
 	unsigned int	shifted;
 
 	i = n;
@@ -32,7 +31,7 @@ void	bytestr(t_parser *parser, int val, int n)
 
 void		free_split(char **array)
 {
-	int i;
+	int				i;
 
 	i = 0;
 	while (array && array[i])
@@ -40,11 +39,11 @@ void		free_split(char **array)
 	free(array);
 }
 
-char	*strip_asm(char *str)
+char		*strip_asm(char *str)
 {
-	int		i;
-	int		j;
-	char	*new;
+	int				i;
+	int				j;
+	char			*new;
 
 	if (str == NULL)
 		return (NULL);
@@ -66,11 +65,11 @@ char	*strip_asm(char *str)
 	return (ft_strdup(str + i));
 }
 
-int		get_line(int fd, char **l)
+int			get_line(int fd, char **l)
 {
-	char	buf[1000];
-	int		i;
-	int		r;
+	char			buf[1000];
+	int				i;
+	int				r;
 
 	ft_bzero(buf, 1000);
 	i = 0;
@@ -97,11 +96,11 @@ int		get_line(int fd, char **l)
 	return (0);
 }
 
-char	*get_asm_line(t_parser *parser)
+char		*get_asm_line(t_parser *parser)
 {
-	char	*l;
-	char	*asml;
-	int		r;
+	char			*l;
+	char			*asml;
+	int				r;
 
 	parser->line++;
 	parser->col = 0;
@@ -123,9 +122,9 @@ char	*get_asm_line(t_parser *parser)
 	return (asml);
 }
 
-void	add_bytes(t_parser *parser, char *s, int n)
+void		add_bytes(t_parser *parser, char *s, int n)
 {
-	int		i;
+	int				i;
 
 	i = 0;
 	while (i < n)
@@ -136,9 +135,8 @@ void	add_bytes(t_parser *parser, char *s, int n)
 	}
 }
 
-void	add_byte(t_parser *parser, int c)
+void		add_byte(t_parser *parser, int c)
 {
 	parser->program[parser->pos] = (int)c;
 	parser->pos++;
 }
-

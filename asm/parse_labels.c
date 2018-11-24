@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_labels.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/12 09:13:40 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/25 12:29:56 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:27:03 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:27:05 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void		add_label(char *str, int i, t_labels **list)
 
 	label = new_label(str, i);
 	head = *list;
-	if (head) // this is not supposed to be true if there have been no labels thus far, however I have not been able to get it to do as such
+	if (head)
 	{
 		while (head->next)
 			head = head->next;
@@ -51,8 +51,6 @@ void		add_label(char *str, int i, t_labels **list)
 	else
 		*list = label;
 }
-
-
 
 int			instruction_val(t_parser *parser, char *str, int k)
 {
@@ -70,20 +68,17 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 	int		j;
 	int		k;
 
-	j = 0;
-	k = -1;
 	while ((r = ft_strchr(asml, SEPARATOR_CHAR)))
 		*r = ' ';
 	instructions = ft_strsplit(asml, ' ');
-	if (instructions && is_label(instructions[j]))
+	if (((j = 0) + 1) && instructions && is_label(instructions[j]))
 		add_label(instructions[j++], i, list);
-	if (instructions && instructions[1])
+	if (instructions && instructions[1] && (k = -1))
 	{
 		while (++k < 17)
 		{
 			if (ft_strequ(instructions[j], parser->op_tab[k].name))
 			{
-				
 				i += (parser->op_tab[k].acb ? 2 : 1);
 				break ;
 			}
@@ -107,7 +102,6 @@ int			get_label_index(t_labels *list, char *label)
 		curr = curr->next;
 	}
 	return (-1);
-
 }
 
 int			first_pass(t_parser *parser, t_labels **list)
@@ -123,40 +117,3 @@ int			first_pass(t_parser *parser, t_labels **list)
 	}
 	return (i);
 }
-
-/*
-
-
-0000000 00 ea 83 f3 74 75 72 74 6c 65 00 00 00 00 00 00
-0000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-*
-0000080 00 00 00 00 00 00 00 00 00 00 01 8a 54 55 52 54
-0000090 4c 45 20 46 46 53 20 55 20 4c 41 4d 41 00 00 00
-00000a0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-*
-0000890 0b 68 01 00 df 00 01 0b 68 01 00 35 00 01 0b 68
-00008a0 01 00 d9 00 01 0b 68 01 00 11 00 01 02 90 00 00
-00008b0 00 00 10 0c 00 bc 01 00 00 00 2a 02 90 1a 2b 00
-00008c0 f0 02 02 90 00 00 00 00 10 0c 00 ae 01 00 00 00
-00008d0 2a 03 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70
-00008e0 03 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03
-00008f0 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03 70
-0000900 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03 70 02
-0000910 fe 70 03 70 02 fe 70 03 70 02 fe 70 03 70 02 fe
-0000920 70 03 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70
-0000930 03 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03
-0000940 70 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03 70
-0000950 02 fe 70 03 70 02 fe 70 03 70 02 fe 70 03 70 02
-0000960 fe 70 03 70 02 fe 70 03 70 02 fe 70 09 ff 60 01
-0000970 00 00 00 2a 09 ff fb 01 00 00 00 2a 03 70 02 01
-0000980 90 03 70 02 01 90 03 70 02 01 90 03 70 02 01 90
-0000990 03 70 02 01 90 03 70 02 01 90 03 70 02 01 90 03
-00009a0 70 02 01 90 03 70 02 01 90 03 70 02 01 90 03 70
-00009b0 02 01 90 03 70 02 01 90 03 70 02 01 90 03 70 02
-00009c0 01 90 03 70 02 01 90 03 70 02 01 90 03 70 02 01
-00009d0 90 03 70 02 01 90 03 70 02 01 90 03 70 02 01 90
-00009e0 03 70 02 01 90 03 70 02 01 90 03 70 02 01 90 03
-00009f0 70 02 01 90 03 70 02 01 90 03 70 02 01 90 03 70
-0000a00 02 01 90 03 70 02 01 90 03 70 02 01 90 03 70 02
-0000a10 01 90 03 70 02 01 90 09 ff 60
-*/

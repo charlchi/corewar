@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_program.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/12 09:13:40 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/25 12:38:03 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/24 16:26:42 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:26:44 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,45 +37,45 @@ void	parse_acb(t_parser *parser, char **tokens, int i)
 	parser->pc++;
 }
 
-void	parse_params(t_parser *parser, char **tokens, int i)
+void	parse_params(t_parser *parser, char **tok, int i)
 {
-	int		num;
+	int		n;
 	int		j;
-	int		startpc;
+	int		s;
 	int		size;
 
-	startpc = parser->pc - 1;
+	s = parser->pc - 1;
 	if (parser->op_tab[i - 1].acb)
-		parse_acb(parser, tokens, i);
+		parse_acb(parser, tok, i);
 	j = 0;
 	while (j < parser->op_tab[i - 1].nargs)
 	{
-		if (tokens[j][0] == 'r')
-			add_byte(parser, ft_atoi(&tokens[j][1]));
-		else if (tokens[j][0] == DIRECT_CHAR)
+		if (tok[j][0] == 'r')
+			add_byte(parser, ft_atoi(&tok[j][1]));
+		else if (tok[j][0] == DIRECT_CHAR)
 		{
 			size = parser->op_tab[i - 1].label_size;
-			if (tokens[j][1] == LABEL_CHAR) // direct label value
+			if (tok[j][1] == LABEL_CHAR)
 			{
-				num = get_label_index(parser->list, &tokens[j][size == 0 ? 4 : 2]);
-				num = num >= startpc ? num - startpc : 0xffff - (startpc - num) + 1;
-				bytestr(parser, num, size == 0 ? 4 : 2);
+				n = get_label_index(parser->list, &tok[j][size == 0 ? 4 : 2]);
+				n = n >= s ? n - s : 0xffff - (s - n) + 1;
+				bytestr(parser, n, size == 0 ? 4 : 2);
 			}
 			else
 			{
-				bytestr(parser, ft_atoi(&tokens[j][1]), size == 0 ? 4 : 2);
+				bytestr(parser, ft_atoi(&tok[j][1]), size == 0 ? 4 : 2);
 			}
 		}
-		else if (ft_isdigit(tokens[j][0]) || tokens[j][0] == '-')
-			bytestr(parser, ft_atoi(&tokens[j][0]), 2);
-		parser->pc += instruction_val(parser, tokens[j], i - 1);
+		else if (ft_isdigit(tok[j][0]) || tok[j][0] == '-')
+			bytestr(parser, ft_atoi(&tok[j][0]), 2);
+		parser->pc += instruction_val(parser, tok[j], i - 1);
 		j++;
 	}
 }
 
 void	parse_program(t_parser *parser)
 {
-	char	**tokens;
+	char	**tok;
 	char	**freetok;
 	char	*r;
 	char	*l;
@@ -85,20 +85,20 @@ void	parse_program(t_parser *parser)
 	{
 		while ((r = ft_strchr(l, SEPARATOR_CHAR)))
 			*r = ' ';
-		tokens = ft_strsplit(l, ' ');
-		freetok = tokens;
-		if (ft_strchr(tokens[0], ':')) // TODO: don't skip label
-			tokens++;
-		if (tokens[0])
+		tok = ft_strsplit(l, ' ');
+		freetok = tok;
+		if (ft_strchr(tok[0], ':'))
+			tok++;
+		if (tok[0])
 		{
 			i = -1;
 			while (++i < 16)
-				if (ft_strequ(tokens[0], parser->op_tab[i].name))
+				if (ft_strequ(tok[0], parser->op_tab[i].name))
 					break ;
 			add_byte(parser, (char)parser->op_tab[i].id);
 			parser->pc++;
-			tokens++;
-			parse_params(parser, tokens, parser->op_tab[i].id);
+			tok++;
+			parse_params(parser, tok, parser->op_tab[i].id);
 		}
 		free_split(freetok);
 		free(l);
@@ -194,40 +194,3 @@ void	parse_champion(char *ifile)
 	close(parser->ifd);
 	close(parser->ofd);
 }
-
-
-/*
-
-##	OURS:
-##	0b 68 01 0078 0001
-##	0b 68 01 0045 0001
-##	02 90 00000001 03
-##	02 90 00000021 06
-##	04 54 02 03 02
-##	08 64 02 0000000f 04
-##	01 00000004
-##	09 003d
-##	0c 0001
-##	02 90 00000000 04
-##	09 fff7
-##	02 90 00000000 04
-##	01 00000004
-##	09 002e
-##
-##	
-##	THEIRS:
-##	0b 68 01 0045 0001 
-##	0b 68 01 0022 0001 
-##	02 90 00000001 03 
-##	02 90 00000021 06
-##	04 54 02 03 02
-##	08 64 02 0000000f 04
-##	01 00000004
-##	09 0010
-##	0c ffeb
-##	02 90 00000000 04
-##	09 ffe1
-##	02 90 00000000 04
-##	01 00000004
-##	09 fffb
-*/

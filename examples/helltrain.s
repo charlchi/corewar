@@ -1,5 +1,5 @@
-.name		"helltrainhelllltrainhelltrainhelltrainhelltrainhelltrain"
-.comment	"choo-choo, motherf*****s !"
+.name "helltrainhelllltrainhelltrainhelltrainhelltrainhelltrain"
+.comment "choo-choo, motherf*****s !"
 
 entry:
 	sti		r1, %:beegees_gen, %1

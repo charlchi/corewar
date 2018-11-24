@@ -15,11 +15,11 @@
 
 t_vm	*g_vm;
 
-static void	(*cw_funcs[16])(t_vm *vm, t_process *cursor) = {
-	cw_live, cw_ld,   cw_st,   cw_add, 
-	cw_sub,  cw_and,  cw_or,   cw_xor,
-	cw_zjmp, cw_ldi,  cw_sti,   cw_fork,
-	cw_lld,  cw_lldi, cw_lfork, cw_aff
+static void	(*g_cw_funcs[16])(t_vm *vm, t_process *cursor) = {
+	cw_live, cw_ld, cw_st, cw_add,
+	cw_sub, cw_and, cw_or, cw_xor,
+	cw_zjmp, cw_ldi, cw_sti, cw_fork,
+	cw_lld, cw_lldi, cw_lfork, cw_aff
 };
 
 int		main(int ac, char **av)
@@ -34,11 +34,12 @@ int		main(int ac, char **av)
 		ft_putstr("load_vm\n");
 		load_vm(&vm);
 	}
-	//printf("%p\n", vm.first);
 	g_vm = &vm;
 	ft_putarena(vm.arena, 64 * 64);
 	run_vm(&vm);
 }
+
+int gg;
 
 void	execute_process(t_vm *vm, t_process *cursor)
 {
@@ -56,26 +57,37 @@ void	execute_process(t_vm *vm, t_process *cursor)
 	{
 		cursor->waitcycles--;
 	}
-	else if ((op > 0 && op < 17)
-		&& check_args(vm, &vm->op_tab[op], cursor))
+	else if ((op > 0 && op < 17))
 	{
-		cursor->waitcycles = vm->op_tab[op].cycles;
-		//fprintf(stderr, "%s ", vm->op_tab[op].name);
-		cw_funcs[op - 1](vm, cursor);
+		if (check_args(vm, &vm->op_tab[op], cursor))
+		{
+			//printf("P   %d | ", gg);
+			cursor->waitcycles = vm->op_tab[op].cycles;
+			//printf("%s ", vm->op_tab[op].name);
+			int i = 0;
+			while (i < vm->op_tab[op].nargs)
+				//printf("%d ", cursor->params[i++]);
+			//printf("\n");
+			g_cw_funcs[op - 1](vm, cursor);
+		} else {
+			//printf("error reading %s\n", vm->op_tab[op].name);
+			cursor->pc++;		
+		}
 
 	}
 	else if (!(op > 0 && op < 17))
 	{
-		//printf("%d not an op\n", op);
 		cursor->pc++;
 	}
 	else
 		cursor->pc++;
 }
 
+
+
 void	run_vm(t_vm	*vm)
 {
-	int cyclesgg = 1000000;
+	int cyclesgg = 2400;
 	t_process	*cursor;
 
 	initscr();
@@ -89,11 +101,7 @@ void	run_vm(t_vm	*vm)
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_BLACK, COLOR_GREEN);
-	
-	//fprintf(stderr, "%d total\n", vm->total_cycles);
-	//fprintf(stderr, "%d cycle\n", vm->cycle);
 	vm->cycle = 1200;
-
 	while (cyclesgg--)
 	{
 		refresh();
@@ -103,17 +111,21 @@ void	run_vm(t_vm	*vm)
 		mvprintw(67, 0, "%10d total_cycles", vm->total_cycles);
 		mvprintw(68, 0, "%10d lives", vm->lives);
 		mvprintw(69, 0, "%10d cycle_to_die", vm->cycle_to_die);
-		//usleep(2000);
+		usleep(2000);
+		gg = 1;
 		cursor = vm->first;
 		while (cursor)
 		{
 			if (!cursor->dead_flag)
+			{
+				cursor->start = cursor->pc;
 				execute_process(vm, cursor);
+			}
 			//if (cursor->pc < 0)
 			//	cursor->pc = MEM_SIZE - (cursor->pc * -1);
 			cursor->pc = cursor->pc % MEM_SIZE;
-			cursor->start = cursor->pc;
 			cursor = cursor->next;
+			gg++;
 		}
 		if (!vm->cycle)
 		{
@@ -129,8 +141,8 @@ void	run_vm(t_vm	*vm)
 		vm->cycle--;
 		
 	}
+	ft_putarena(vm->arena, 64 * 64);
 	endwin();
-	//exit_sequence(vm);
 }
 
 void	print_vm(t_vm *vm)
@@ -156,7 +168,10 @@ void	print_vm(t_vm *vm)
 	while (cursor) {
 		if (!cursor->dead_flag) {
 			attron(COLOR_PAIR(5));
-			mvprintw(1 + cursor->start / 64, 1 + (cursor->start % 64 * 3), "%02x", vm->arena[cursor->start]);
+			if (cursor->waitcycles)
+				mvprintw(1 + cursor->start / 64, 1 + (cursor->start % 64 * 3), "%02x", vm->arena[cursor->start]);
+			else
+				mvprintw(1 + cursor->pc / 64, 1 + (cursor->pc % 64 * 3), "%02x", vm->arena[cursor->pc]);
 			attroff(COLOR_PAIR(5));
 			mvprintw(0, 0, "");
 		}

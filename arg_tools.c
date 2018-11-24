@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   arg_tools.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/24 16:44:53 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/24 16:48:06 by cmoller          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "corewar.h"
 
@@ -22,7 +33,7 @@ int		check_args(t_vm *vm, t_op *op, t_process *cursor)
 	int			i;
 	int			read;
 	int			code;
-	
+
 	cursor->start = cursor->pc;
 	if (op->acb == 0)
 		return (check_args_nocode(vm, op, cursor));
@@ -35,8 +46,8 @@ int		check_args(t_vm *vm, t_op *op, t_process *cursor)
 			code++;
 		if ((op->argtype[i] & code) == 0)
 			return (0);
-		if ((code == T_REG && (vm->arena[MEM(read)] < 0
-			|| vm->arena[MEM(read)] > 15)))
+		if ((code == T_REG && (vm->arena[MEM(read)] < 1
+			|| vm->arena[MEM(read)] > 16)))
 			return (0);
 		else if (code == T_REG)
 			cursor->is_reg[i] = 1;
@@ -58,11 +69,10 @@ int		code_size(int code, int label_size)
 	return (0);
 }
 
-
 int		read_arg(t_vm *vm, int pos, int code, int label_size)
 {
-	int		ret;
-	
+	int			ret;
+
 	if (code == T_REG)
 	{
 		ret = vm->arena[MEM(pos)] - 1;
@@ -79,6 +89,6 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 		ret = (vm->arena[MEM(pos + 1)] << 0);
 		ret += (vm->arena[MEM(pos + 0)] << 8);
 		ret = (short)ret;
-	}	
+	}
 	return (ret);
 }
