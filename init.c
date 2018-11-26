@@ -116,6 +116,10 @@ void	count_champs(t_vm *vm, int ac, char **av)
 			}
 			close(fd);
 		}
+		if (ft_strequ(av[i], "-v"))
+		{
+			vm->v = 1;
+		}
 		i++;
 	}
 }
@@ -128,6 +132,7 @@ void	init(t_vm *vm)
 	vm->cycle = 0;
 	vm->cycle_to_die = CYCLE_TO_DIE;
 	vm->lives = 0;
+	vm->v = 0;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);

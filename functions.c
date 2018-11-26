@@ -36,7 +36,7 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 	int				reg;
 
 	reg = cursor->params[1];
-	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
+	index = cursor->start + 2 + (cursor->params[0] % IDX_MOD);
 	cursor->reg[reg] = vm->arena[MEM(index + 3)] << 0;
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
@@ -54,8 +54,7 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		cursor->reg[cursor->params[1]] = reg;
 	else
 	{
-
-		index = (cursor->start + (IDX(cursor->params[1])));
+		index = cursor->start + (cursor->params[1] % IDX_MOD);
 		//fprintf(stderr, "\n\rst star:[%d] p1:[%d] index:[%d] \n\r", cursor->start, cursor->params[1], index);
 		vm->arena[MEM(index + 0)] = (reg & 0xff000000) >> 24;
 		vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;

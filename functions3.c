@@ -17,7 +17,7 @@ void	cw_zjmp(t_vm *vm, t_process *cursor)
 	int			index;
 
 	(void)vm;
-	index = MEM(cursor->start + ((signed short)cursor->params[0] % IDX_MOD));
+	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
 	if (cursor->carry)
 		cursor->pc = index;
 }

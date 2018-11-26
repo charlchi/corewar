@@ -64,8 +64,8 @@ void	execute_process(t_vm *vm, t_process *cursor)
 			//printf("P   %d | ", gg);
 			cursor->waitcycles = vm->op_tab[op].cycles;
 			//printf("%s ", vm->op_tab[op].name);
-			int i = 0;
-			while (i < vm->op_tab[op].nargs)
+			//int i = 0;
+			//while (i < vm->op_tab[op].nargs)
 				//printf("%d ", cursor->params[i++]);
 			//printf("\n");
 			g_cw_funcs[op - 1](vm, cursor);
@@ -83,34 +83,18 @@ void	execute_process(t_vm *vm, t_process *cursor)
 		cursor->pc++;
 }
 
-
-
 void	run_vm(t_vm	*vm)
 {
-	int cyclesgg = 2400;
+	int cyclesgg = 24000;
 	t_process	*cursor;
 
-	initscr();
-	noecho();
-	clear();
-	start_color();
-	use_default_colors();
-	init_pair(0, COLOR_WHITE, COLOR_RED);
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-	init_pair(2, COLOR_BLUE, COLOR_BLACK);
-	init_pair(3, COLOR_GREEN, COLOR_BLACK);
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_BLACK, COLOR_GREEN);
+	if (vm->v)
+		init_viz();
 	vm->cycle = 1200;
 	while (cyclesgg--)
 	{
-		refresh();
-		erase();
-		print_vm(vm);
-		mvprintw(66, 0, "%10d cycle", vm->cycle);
-		mvprintw(67, 0, "%10d total_cycles", vm->total_cycles);
-		mvprintw(68, 0, "%10d lives", vm->lives);
-		mvprintw(69, 0, "%10d cycle_to_die", vm->cycle_to_die);
+		if (vm->v)
+			print_vm(vm);
 		usleep(2000);
 		gg = 1;
 		cursor = vm->first;
@@ -144,39 +128,3 @@ void	run_vm(t_vm	*vm)
 	ft_putarena(vm->arena, 64 * 64);
 	endwin();
 }
-
-void	print_vm(t_vm *vm)
-{
-	t_process	*cursor;
-	int			i;
-
-	i = 0;
-	printw("\n");
-	while (i < 64 * 64) {
-		printw(" ");
-		attron(COLOR_PAIR(vm->colors[i]));
-		printw("%02x", vm->arena[i]);
-		attroff(COLOR_PAIR(vm->colors[i]));
-		i++;
-		if (i != 0 && i % 64 == 0)
-		{
-			printw(" %02", i);
-			printw("\n");
-		}
-	}
-	cursor = vm->first;
-	while (cursor) {
-		if (!cursor->dead_flag) {
-			attron(COLOR_PAIR(5));
-			if (cursor->waitcycles)
-				mvprintw(1 + cursor->start / 64, 1 + (cursor->start % 64 * 3), "%02x", vm->arena[cursor->start]);
-			else
-				mvprintw(1 + cursor->pc / 64, 1 + (cursor->pc % 64 * 3), "%02x", vm->arena[cursor->pc]);
-			attroff(COLOR_PAIR(5));
-			mvprintw(0, 0, "");
-		}
-		cursor = cursor->next;
-	}
-}
-
-

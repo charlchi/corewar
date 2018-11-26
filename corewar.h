@@ -76,8 +76,13 @@ typedef struct		s_vm
 	int				cycle;
 	int				cycle_to_die;
 	int				lives;
+	int				v;
 }					t_vm;
 
+void				init_viz(void);
+void				print_arena(t_vm *vm);
+void				print_cursors(t_vm *vm);
+void				print_info(t_vm *vm);
 void				print_vm(t_vm *vm);
 void				run_vm(t_vm *vm);
 void				add_cursor(t_vm *vm, t_process *cursor);
