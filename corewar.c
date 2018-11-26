@@ -39,39 +39,54 @@ int		main(int ac, char **av)
 	run_vm(&vm);
 }
 
-int gg;
-
 void	execute_process(t_vm *vm, t_process *cursor)
 {
 	int		op;
 
-	op = 0;
-	while (op < 3)
-	{
-		cursor->is_reg[op] = 0;
-		cursor->params[op] = 0;
-		op++;
-	}
+
 	op = vm->arena[cursor->pc];
 	if (cursor->waitcycles)
 	{
 		cursor->waitcycles--;
+		if (cursor->waitcycles == 0)
+		{
+			op = vm->arena[cursor->start];
+			DPRINT("P %4d | ", cursor->n);
+			DPRINT("%s ", vm->op_tab[op].name);
+			int i = -1;
+			while (++i < vm->op_tab[op].nargs)
+			{
+				if (cursor->is_reg[i])
+				{
+					DPRINT("r%d ", cursor->params[i] + 1);
+				}
+				else
+				{
+					DPRINT("%d ", cursor->params[i]);
+				}
+			}
+			
+			//DPRINT("\n");
+			g_cw_funcs[op - 1](vm, cursor);
+			DPRINT("\n");
+			DPRINT("ADV %d ", cursor->pc - cursor->start);
+			DPRINT("(0x%04x -> 0x%04x) ", cursor->start, cursor->pc);
+			i = cursor->start - 1;
+			while (++i < cursor->pc)
+				DPRINT("%02x ", vm->arena[MEM(i)]);
+			DPRINT("\n");
+			cursor->start = cursor->pc;
+		}
 	}
 	else if ((op > 0 && op < 17))
 	{
+		clear_cursor_params(cursor);
 		if (check_args(vm, &vm->op_tab[op], cursor))
 		{
-			//printf("P   %d | ", gg);
 			cursor->waitcycles = vm->op_tab[op].cycles;
-			//printf("%s ", vm->op_tab[op].name);
-			//int i = 0;
-			//while (i < vm->op_tab[op].nargs)
-				//printf("%d ", cursor->params[i++]);
-			//printf("\n");
-			g_cw_funcs[op - 1](vm, cursor);
 		} else {
-			//printf("error reading %s\n", vm->op_tab[op].name);
-			cursor->pc++;		
+			DPRINT("Skipping faulty arg %s\n", vm->op_tab[op].name);
+			cursor->pc++;
 		}
 
 	}
@@ -85,31 +100,27 @@ void	execute_process(t_vm *vm, t_process *cursor)
 
 void	run_vm(t_vm	*vm)
 {
-	int cyclesgg = 24000;
+	char		ch;
+	int cyclesgg = 2400000;
 	t_process	*cursor;
 
-	if (vm->v)
+	if (vm->v == 1)
 		init_viz();
 	vm->cycle = 1200;
-	while (cyclesgg--)
+	while (cyclesgg-- && (ch = getch()) == ERR)
 	{
-		if (vm->v)
+		if (vm->v == 1)
 			print_vm(vm);
-		usleep(2000);
-		gg = 1;
+		//usleep(14000);
 		cursor = vm->first;
 		while (cursor)
 		{
 			if (!cursor->dead_flag)
-			{
-				cursor->start = cursor->pc;
 				execute_process(vm, cursor);
-			}
 			//if (cursor->pc < 0)
 			//	cursor->pc = MEM_SIZE - (cursor->pc * -1);
 			cursor->pc = cursor->pc % MEM_SIZE;
 			cursor = cursor->next;
-			gg++;
 		}
 		if (!vm->cycle)
 		{

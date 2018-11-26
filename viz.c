@@ -17,6 +17,7 @@ void	init_viz(void)
 {
 	initscr();
 	noecho();
+	nodelay(stdscr, TRUE);
 	clear();
 	start_color();
 	use_default_colors();
@@ -61,7 +62,8 @@ void	print_cursors(t_vm *vm)
 		if (!c->dead_flag) {
 			x = 1 + c->start / 64;
 			y = 1 + (c->start % 64 * 3);
-			i = c->waitcycles ? c->start : c->pc;
+			//i = c->waitcycles ? c->start : c->pc;
+			i = c->start;
 			attron(COLOR_PAIR(5));
 			mvprintw(x, y, "%02x", vm->arena[i]);
 			attroff(COLOR_PAIR(5));

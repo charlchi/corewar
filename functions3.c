@@ -12,65 +12,80 @@
 
 #include "corewar.h"
 
-void	cw_zjmp(t_vm *vm, t_process *cursor)
+void	cw_zjmp(t_vm *vm, t_process *c)
 {
 	int			index;
 
 	(void)vm;
-	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
-	if (cursor->carry)
-		cursor->pc = index;
+	index = MEM(c->start + (c->params[0] % IDX_MOD));
+	DPRINT("             | carry: %d ", c->carry);
+	if (c->carry)
+		c->pc = index;
 }
 
-void	cw_ldi(t_vm *vm, t_process *cursor)
+void	cw_ldi(t_vm *vm, t_process *c)
 {
 	int			index;
 	int			reg;
 
-	if (cursor->is_reg[0])
-		cursor->params[0] = cursor->reg[cursor->params[0]];
-	if (cursor->is_reg[1])
-		cursor->params[1] = cursor->reg[cursor->params[1]];
-	reg = cursor->params[2];
-	index = (cursor->params[0] + cursor->params[1]) % IDX_MOD;
-	index = MEM(cursor->start + 2 + index);
-	cursor->reg[reg] = vm->arena[MEM(index + 3)] << 0;
-	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
-	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
-	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
-	cursor->carry = !(cursor->reg[reg]);
+	if (c->is_reg[0])
+		c->params[0] = c->reg[c->params[0]];
+	if (c->is_reg[1])
+		c->params[1] = c->reg[c->params[1]];
+	reg = c->params[2];
+	index = (c->params[0] + c->params[1]) % IDX_MOD;
+	index = MEM(c->start + 2 + index);
+	c->reg[reg] = vm->arena[MEM(index + 3)] << 0;
+	c->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
+	c->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
+	c->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
+	c->carry = !(c->reg[reg]);
 }
 
-void	cw_sti(t_vm *vm, t_process *cursor)
+void	cw_sti(t_vm *vm, t_process *c)
 {
 	int				index;
 	int				reg;
 
-	reg = cursor->reg[cursor->params[0]];
-	if (cursor->is_reg[1])
-		cursor->params[1] = cursor->reg[cursor->params[1]];
-	if (cursor->is_reg[2])
-		cursor->params[2] = cursor->reg[cursor->params[2]];
-	index = (cursor->params[1] + cursor->params[2]) % IDX_MOD;
-	index = MEM(cursor->start + index);
+	reg = c->reg[c->params[0]];
+	if (c->is_reg[1])
+		c->params[1] = c->reg[c->params[1]];
+	if (c->is_reg[2])
+		c->params[2] = c->reg[c->params[2]];
+	index = (c->params[1] + c->params[2]) % IDX_MOD;
+	index = MEM(c->start + index);
 	vm->arena[MEM(index + 0)] = ((reg & 0xff000000) >> 24);
 	vm->arena[MEM(index + 1)] = ((reg & 0x00ff0000) >> 16);
 	vm->arena[MEM(index + 2)] = ((reg & 0x0000ff00) >> 8);
 	vm->arena[MEM(index + 3)] = ((reg & 0x000000ff) >> 0);
-	vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start)];
-	vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start)];
-	vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start)];
-	vm->colors[MEM(index + 3)] = vm->colors[MEM(cursor->start)];
+	DPRINT("\n      | -> store to %d + %d = %d",
+		c->params[1], c->params[2], c->params[1] + c->params[2]);       
+	DPRINT("     | %02x", vm->arena[MEM(index + 0)]);
+	DPRINT("%02x", vm->arena[MEM(index + 1)]);
+	DPRINT("%02x", vm->arena[MEM(index + 2)]);
+	DPRINT("%02x ", vm->arena[MEM(index + 3)]);
+	vm->colors[MEM(index + 0)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 1)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 2)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 3)] = vm->colors[MEM(c->start)];
 }
 
-void	cw_fork(t_vm *vm, t_process *cursor)
+void	cw_fork(t_vm *vm, t_process *c)
 {
 	int				index;
-	t_process		*newcursor;
+	t_process		*newc;
 
 	(void)vm;
-	index = MEM(cursor->start + (cursor->params[0] % IDX_MOD));
-	newcursor = clone_cursor(cursor, index);
-	newcursor->carry = 0;
-	add_cursor(vm, newcursor);
+	if (c->carry)
+	{
+		index = MEM(c->start + (c->params[0] % IDX_MOD));
+		DPRINT("             | pc at: %d ", index);
+		newc = clone_cursor(c, index);
+		newc->carry = c->carry;
+		add_cursor(vm, newc);
+	}
+	else
+	{
+		DPRINT("             | carry not set");
+	}
 }

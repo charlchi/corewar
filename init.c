@@ -97,29 +97,25 @@ void	count_champs(t_vm *vm, int ac, char **av)
 	{
 		if (ft_contains(av[i], ".cor"))
 		{
-			fd = open(av[i], O_RDONLY);
-			if (fd < 1)
+			if ((fd = open(av[i], O_RDONLY)) < 1)
 			{
 				col_str_fd(FRED, "Invalid File\t:\t", 1);
 				ft_putendl_fd(av[i], 1);
 				exit(1);
 			}
-			else
-			{
-				vm->champs[vm->num_champs].ldnbr = vm->num_champs;
-				vm->champs[vm->num_champs].number = vm->num_champs;
-				vm->champs[vm->num_champs].name = ft_strdup(av[i]);
-				ft_putendl_fd(vm->champs[vm->num_champs].name, 1);
-				vm->num_champs++;
-				col_str_fd(FGRN, "Valid File\t:\t", 1);
-				ft_putendl_fd(av[i], 1);
-			}
+			vm->champs[vm->num_champs].ldnbr = vm->num_champs;
+			vm->champs[vm->num_champs].number = vm->num_champs;
+			vm->champs[vm->num_champs].name = ft_strdup(av[i]);
+			ft_putendl_fd(vm->champs[vm->num_champs].name, 1);
+			vm->num_champs++;
+			col_str_fd(FGRN, "Valid File\t:\t", 1);
+			ft_putendl_fd(av[i], 1);
 			close(fd);
 		}
 		if (ft_strequ(av[i], "-v"))
-		{
 			vm->v = 1;
-		}
+		if (ft_strequ(av[i], "-d"))
+			vm->v = -1;
 		i++;
 	}
 }
@@ -205,7 +201,7 @@ void	load_vm(t_vm *vm)
 		printf("creating one player\n");
 		vm->champs[p].start = vm->champs[p].ldnbr * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
-		cur->waitcycles = vm->op_tab[vm->arena[cur->pc]].cycles;
+		cur->waitcycles = 0;
 		cur->reg[0] = 0xffffffff - p;
 		i = 1;
 		while (i < 16)

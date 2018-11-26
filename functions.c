@@ -35,12 +35,16 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 	int				index;
 	int				reg;
 
+	(void)vm;
 	reg = cursor->params[1];
+	if (cursor->params[0] < 0)
+		cursor->params[0] = MEM_SIZE - (abs(cursor->params[0]) % IDX_MOD);	
 	index = cursor->start + 2 + (cursor->params[0] % IDX_MOD);
-	cursor->reg[reg] = vm->arena[MEM(index + 3)] << 0;
-	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
-	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);
-	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 24);
+	cursor->reg[reg] = vm->arena[MEM(index + 0)] << 0;
+	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 8);
+	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 16);
+	cursor->reg[reg] += (vm->arena[MEM(index + 3)] << 24);
+	DPRINT(" | %08x", cursor->reg[reg]);
 	cursor->carry = !(cursor->reg[reg]);
 }
 
@@ -60,6 +64,10 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		vm->arena[MEM(index + 1)] = (reg & 0x00ff0000) >> 16;
 		vm->arena[MEM(index + 2)] = (reg & 0x0000ff00) >> 8;
 		vm->arena[MEM(index + 3)] = (reg & 0x000000ff) >> 0;
+		DPRINT("       | %02x", vm->arena[MEM(index + 0)]);
+		DPRINT("%02x", vm->arena[MEM(index + 1)]);
+		DPRINT("%02x", vm->arena[MEM(index + 2)]);
+		DPRINT("%02x ", vm->arena[MEM(index + 3)]);
 		vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start)];

@@ -30,6 +30,7 @@
 					printf("\n");}
 # define MEM(x) (x >= 0 ? (x % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
 # define IDX(x) (x >= 0 ? (x % IDX_MOD) : -((abs(x) % IDX_MOD)))
+# define DPRINT(x, ...) if (vm->v == -1) printf(x, ##__VA_ARGS__);
 
 typedef struct		s_process
 {
@@ -43,6 +44,7 @@ typedef struct		s_process
 	int				carry;
 	int				reg[REG_NUMBER];
 	void			*next;
+	int				n;
 }					t_process;
 
 
@@ -85,6 +87,7 @@ void				print_cursors(t_vm *vm);
 void				print_info(t_vm *vm);
 void				print_vm(t_vm *vm);
 void				run_vm(t_vm *vm);
+void				clear_cursor_params(t_process *orig);
 void				add_cursor(t_vm *vm, t_process *cursor);
 int					living_cursors(t_vm *vm);
 void				kill_cursors(t_vm *vm);
