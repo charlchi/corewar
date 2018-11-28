@@ -111,6 +111,7 @@ void	place_player(t_vm *vm, int pnum)
 		ft_putstr("champion exists : \n");
 	else
 		exit(1);
+	printf("%d %s\n", pnum, ch->path);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
