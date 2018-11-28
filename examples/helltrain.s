@@ -1,5 +1,8 @@
-.name "helltrainhelllltrainhelltrainhelltrainhelltrainhelltrain"
-.comment "choo-choo, motherf*****s !"
+#by zaz, still not as good as rainbowdash though
+#2013
+
+.name		"helltrain"
+.comment	"choo-choo, motherf*****s !"
 
 entry:
 	sti		r1, %:beegees_gen, %1

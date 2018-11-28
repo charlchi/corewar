@@ -40,17 +40,19 @@ void	execute_process(t_vm *vm, t_process *c)
 			while (++i < vm->op_tab[op].nargs)
 				c->is_reg[i] ? DPRINT("r%d ", c->params[i] + 1)
 				: DPRINT("%d ", c->params[i]);
-			
 			//DPRINT("\n");
 			g_cw_funcs[op - 1](vm, c);
 			DPRINT("\n");
-			DPRINT("ADV %d ", c->pc - c->start);
-			DPRINT("(0x%04x -> 0x%04x) ", c->start, c->pc);
-			i = c->start - 1;
-			while (++i < c->pc)
-				DPRINT("%02x ", vm->arena[MEM(i)]);
-			DPRINT("\n");
-			c->start = c->pc;
+			if (op != 9)
+			{
+				DPRINT("ADV %d ", c->pc - c->start);
+				DPRINT("(0x%04x -> 0x%04x) ", c->start, c->pc);
+				i = c->start - 1;
+				while (++i < c->pc)
+					DPRINT("%02x ", vm->arena[MEM(i)]);
+				DPRINT("\n");
+				c->start = c->pc;
+			}
 		}
 	}
 	else if ((op > 0 && op < 17))
@@ -58,7 +60,7 @@ void	execute_process(t_vm *vm, t_process *c)
 		clear_cursor_params(c);
 		if (check_args(vm, &vm->op_tab[op], c))
 		{
-			c->waitcycles = vm->op_tab[op].cycles;
+			c->waitcycles = vm->op_tab[op].cycles - 1;
 		} else {
 			DPRINT("Skipping faulty arg %s\n", vm->op_tab[op].name);
 			c->pc++;
@@ -71,17 +73,18 @@ void	execute_process(t_vm *vm, t_process *c)
 void	run_vm(t_vm	*vm)
 {
 	char		ch;
-	int cyclesgg = 24000;
 	t_process	*cursor;
 
-	if (vm->v == 1)
+	if (vm->v == 2)
 		init_viz();
 	vm->cycle = 1200;
-	while (cyclesgg-- && !((ch = getch()) >= 'a' && ch <= 'z'))
+	while (vm->total_cycles != vm->dump && !((ch = getch()) >= 'a' && ch <= 'z'))
 	{
-		if (vm->v == 1)
+		if (vm->v == 2)
+		{
 			print_vm(vm);
-		usleep(2000);
+			usleep(2000);
+		}
 		cursor = vm->first;
 		while (cursor)
 		{
@@ -104,5 +107,26 @@ void	run_vm(t_vm	*vm)
 		vm->cycle--;
 		
 	}
+	if (vm->v == 2)
+		usleep(2000000);
+	if (vm->total_cycles == vm->dump)
+		dump_vm(vm);
 	endwin();
+}
+
+void		dump_vm(t_vm *vm)
+{
+	int			i;
+
+	i = 0;
+	while (i < MEM_SIZE)
+	{
+		if (i != 0 && i % 64 == 0)
+			printf("\n");
+		if (i % 64 == 0)
+			printf("0x%04x : ", i);
+		printf("%02x ", vm->arena[i]);
+		i++;
+	}
+	printf("\n");
 }

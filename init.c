@@ -91,10 +91,10 @@ void	load_champs(t_vm *vm, int ac, char **av)
 			vm->num_champs++;
 			close(fd);
 		}
-		if (ft_strequ(av[i], "-v"))
-			vm->v = 1;
-		if (ft_strequ(av[i], "-d"))
-			vm->v = -1;
+		if (ft_strncmp(av[i], "-v", 2) == 0)
+			vm->v = atoi(&av[i][2]);
+		if (ft_strncmp(av[i], "-d", 2) == 0)
+			vm->dump = atoi(&av[i][2]);
 		i++;
 	}
 }
@@ -107,11 +107,8 @@ void	place_player(t_vm *vm, int pnum)
 
 	ch = &vm->champs[pnum];
 	ch->fd = open(ch->path, O_RDONLY);
-	if (ch->fd > 0)
-		ft_putstr("champion exists : \n");
-	else
+	if (ch->fd < 1)
 		exit(1);
-	printf("%d %s\n", pnum, ch->path);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
@@ -126,7 +123,6 @@ void	place_player(t_vm *vm, int pnum)
 	}
 	ch->p_size = i;
 	ft_memcpy(&vm->arena[ch->start], ch->core, ch->p_size);
-	ft_putstr("Loaded player succesfully\n");
 }
 
 void	load_vm(t_vm *vm)
@@ -136,9 +132,9 @@ void	load_vm(t_vm *vm)
 	t_process	*cur;
 
 	p = 0;
+	ft_putstr("Introducing contestants...\n");
 	while (p < vm->num_champs)
 	{
-		printf("creating one player\n");
 		vm->champs[p].start = vm->champs[p].number * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
@@ -148,7 +144,13 @@ void	load_vm(t_vm *vm)
 			cur->reg[i++] = 0;
 		add_cursor(vm, cur);
 		place_player(vm, p);
+		ft_putstr("* Player ");
+		ft_putnbr(p + 1);
+		ft_putstr(", weighing ");
+		ft_putnbr(vm->champs[p].p_size);
+		ft_putstr(" bytes, ");
+		ft_putstr((char *)vm->champs[p].prog_name);
+		ft_putstr("\n");
 		p++;
 	}
-	ft_putstr("Done load_vm\n");
 }

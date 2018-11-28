@@ -51,7 +51,6 @@ void	print_arena(t_vm *vm)
 			printw(" \n ");
 			attroff(COLOR_PAIR(5));
 		}
-		//attroff(A_UNDERLINE);
 	}
 	i = -1;
 	attron(COLOR_PAIR(5));
@@ -73,8 +72,7 @@ void	print_cursors(t_vm *vm)
 	while (c) {
 		if (!c->dead_flag) {
 			y = 1 + c->start / 64;
-			x = (c->start % 64 * 2);
-			//i = c->waitcycles ? c->start : c->pc;
+			x = 1+ (c->start % 64 * 2);
 			i = c->start;
 			attron(COLOR_PAIR(5));
 			mvprintw(y, x, "%02x", vm->arena[i]);

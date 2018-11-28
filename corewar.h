@@ -19,9 +19,9 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# define MEM(x) (x >= 0 ? (x % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
-# define IDX(x) (x >= 0 ? (x % IDX_MOD) : -((abs(x) % IDX_MOD)))
-# define DPRINT(x, ...) ((vm->v == -1) ? printf(x, ##__VA_ARGS__) : 0)
+# define MEM(x) ((x) >= 0 ? ((x) % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
+# define IDX(x) ((x) >= 0 ? ((x) % IDX_MOD) : -((abs(x) % IDX_MOD)))
+# define DPRINT(x, ...) ((vm->v & 1) ? printf(x, ##__VA_ARGS__) : 0)
 
 typedef struct		s_process
 {
@@ -69,6 +69,7 @@ typedef struct		s_vm
 	int				cycle_to_die;
 	int				lives;
 	int				v;
+	int				dump;
 }					t_vm;
 
 /*		viz.c */
@@ -80,6 +81,7 @@ void				print_vm(t_vm *vm);
 /*		corewar.c */
 void				run_vm(t_vm *vm);
 void				execute_process(t_vm *vm, t_process *cursor);
+void				dump_vm(t_vm *vm);
 /*		cursors.c */
 t_process			*create_cursor(int i);
 t_process			*clone_cursor(t_process *orig, int pc);

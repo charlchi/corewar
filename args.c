@@ -73,6 +73,13 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 {
 	int			ret;
 
+	DPRINT("s_______\n");
+	DPRINT(" 0x%04x %02x\n", (MEM(pos - 2)), vm->arena[(MEM(pos - 2))]);
+	DPRINT(" 0x%04x %02x\n", (MEM(pos - 1)), vm->arena[(MEM(pos - 1))]);
+	DPRINT(" 0x%04x %02x\n", (MEM(pos + 0)), vm->arena[(MEM(pos + 0))]);
+	DPRINT(" 0x%04x %02x\n", (MEM(pos + 1)), vm->arena[(MEM(pos + 1))]);
+	DPRINT(" 0x%04x %02x\n", (MEM(pos + 2)), vm->arena[(MEM(pos + 2))]);
+	
 	if (code == T_REG)
 	{
 		ret = vm->arena[MEM(pos)] - 1;
@@ -86,9 +93,10 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 	}
 	else
 	{
-		ret = (vm->arena[MEM(pos + 1)] << 0);
-		ret += (vm->arena[MEM(pos + 0)] << 8);
+		ret = (vm->arena[MEM(pos + 1)]) << 0;
+		ret += (vm->arena[MEM(pos + 0)]) << 8;
 		ret = (short)ret;
 	}
+	DPRINT("^^^^^^^^^e\n");
 	return (ret);
 }

@@ -18,9 +18,12 @@ void	cw_zjmp(t_vm *vm, t_process *c)
 
 	(void)vm;
 	index = MEM(c->start + (c->params[0] % IDX_MOD));
-	DPRINT("             | carry: %d ", c->carry);
 	if (c->carry)
+	{
+		DPRINT("OK");
 		c->pc = index;
+		c->start = index;
+	}
 }
 
 void	cw_ldi(t_vm *vm, t_process *c)
@@ -79,7 +82,7 @@ void	cw_fork(t_vm *vm, t_process *c)
 	if (c->carry)
 	{
 		index = MEM(c->start + (c->params[0] % IDX_MOD));
-		DPRINT("             | pc at: %d ", index);
+		DPRINT("(%d) ", index);
 		newc = clone_cursor(c, index);
 		newc->carry = c->carry;
 		add_cursor(vm, newc);
