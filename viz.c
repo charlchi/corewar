@@ -26,6 +26,99 @@ void	init_viz(void)
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
+	init_pair(5, COLOR_BLACK, COLOR_WHITE);
+}
+
+void	print_arena(t_vm *vm)
+{
+	int			i;
+
+	i = -1;
+	attron(COLOR_PAIR(5));
+	while (++i < 64*2 + 2)
+		printw(" ");
+	printw("\n ");
+	attroff(COLOR_PAIR(5));
+	i = 0;	
+	while (i < 64 * 64) {
+		attron(COLOR_PAIR(vm->colors[i]));
+		printw("%02x", vm->arena[i]);
+		attroff(COLOR_PAIR(vm->colors[i]));
+		i++;
+		if (i != 0 && i % 64 == 0)
+		{
+			attron(COLOR_PAIR(5));
+			printw(" \n ");
+			attroff(COLOR_PAIR(5));
+		}
+		//attroff(A_UNDERLINE);
+	}
+	i = -1;
+	attron(COLOR_PAIR(5));
+	while (++i < 64*2 + 1)
+		printw(" ");
+	attroff(COLOR_PAIR(5));
+	i = -1;
+	printw("\n");
+}
+
+void	print_cursors(t_vm *vm)
+{
+	t_process	*c;
+	int			i;
+	int			y;
+	int			x;
+
+	c = vm->first;
+	while (c) {
+		if (!c->dead_flag) {
+			y = 1 + c->start / 64;
+			x = (c->start % 64 * 2);
+			//i = c->waitcycles ? c->start : c->pc;
+			i = c->start;
+			attron(COLOR_PAIR(5));
+			mvprintw(y, x, "%02x", vm->arena[i]);
+			attroff(COLOR_PAIR(5));
+			//mvprintw(0, 0, "");
+		}
+		c = c->next;
+	}
+}
+
+void	print_info(t_vm *vm)
+{
+	mvprintw(1, 2 + 64 * 2, "%8d cycle\n", vm->cycle);
+	mvprintw(2, 2 + 64 * 2, "%8d total_cycles\n", vm->total_cycles);
+	mvprintw(3, 2 + 64 * 2, "%8d lives\n", vm->lives);
+	mvprintw(4, 2 + 64 * 2, "%8d cycle_to_die\n", vm->cycle_to_die);
+}
+
+void	print_vm(t_vm *vm)
+{
+	refresh();
+	erase();
+	print_arena(vm);
+	print_info(vm);
+	print_cursors(vm);
+}
+/*
+
+#include "libft/libft.h"
+#include "corewar.h"
+
+void	init_viz(void)
+{
+	initscr();
+	noecho();
+	nodelay(stdscr, TRUE);
+	clear();
+	start_color();
+	use_default_colors();
+	init_pair(0, COLOR_WHITE, COLOR_RED);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);
+	init_pair(3, COLOR_GREEN, COLOR_BLACK);
+	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_BLACK, COLOR_GREEN);
 }
 
@@ -89,3 +182,4 @@ void	print_vm(t_vm *vm)
 	print_cursors(vm);
 	print_info(vm);
 }
+*/

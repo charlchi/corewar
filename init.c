@@ -12,54 +12,36 @@
 
 #include "corewar.h"
 
-#define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) ERROR(str)
-#define ERROR(str) (col_endl_fd(FRED, str, 1),exit(0))
-#define RSET "\033[00m"
-#define FBLK "\033[30m"
-#define FRED "\033[31m"
-#define FGRN "\033[32m"
-#define FYEL "\033[33m"
-#define FBLU "\033[34m"
-#define FMAG "\033[35m"
-#define FCYN "\033[36m"
-#define FWHT "\033[37m"
+#define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) \
+	{ft_putendl(str); exit(0);}
 
-void	col_endl_fd(char *colour, char *str, int fd)
+int		main(int ac, char **av)
 {
-	col_str_fd(colour, str, fd);
-	col_str_fd(colour, "\n", fd);
+	t_vm		vm;
+
+	if (ac < 2)
+	{
+		//todo print usage
+		exit(0);
+	}
+	init_vm(&vm);
+	load_champs(&vm, ac, av);
+	load_vm(&vm);
+	run_vm(&vm);
 }
 
-void	col_char_fd(char *colour, char c, int fd)
+void	init_vm(t_vm *vm)
 {
-	col_str_fd(colour, &c, fd);
-}
-
-void	col_str_fd(char *colour, char *str, int fd)
-{
-	ft_putstr_fd(colour, fd);
-	ft_putstr_fd(str, fd);
-	ft_putstr_fd(RSET, fd);
-}
-
-void	ft_nbrendl_fd(int nbr, int fd)
-{
-	ft_putnbr_fd(nbr, fd);
-	ft_putchar_fd('\n', fd);
-}
-
-void	ft_nbrendl(int nbr)
-{
-	ft_nbrendl_fd(nbr, 2);
-}
-
-void	ft_putarr_fd(char **arr, int fd)
-{
-	int		i;
-
-	i = 0;
-	while (arr[i] != '\0')
-		ft_putendl_fd(arr[i++], fd);
+	vm->num_champs = 0;
+	vm->first = NULL;
+	vm->total_cycles = 0;
+	vm->cycle = 0;
+	vm->cycle_to_die = CYCLE_TO_DIE;
+	vm->lives = 0;
+	vm->v = 0;
+	ft_bzero(vm->arena, MEM_SIZE);
+	ft_bzero(vm->colors, MEM_SIZE);
+	set_op_tab(vm);
 }
 
 int		ft_contains(char *whole, char *part)
@@ -86,7 +68,7 @@ int		ft_contains(char *whole, char *part)
 	return (0);
 }
 
-void	count_champs(t_vm *vm, int ac, char **av)
+void	load_champs(t_vm *vm, int ac, char **av)
 {
 	int		i;
 	int		fd;
@@ -95,21 +77,18 @@ void	count_champs(t_vm *vm, int ac, char **av)
 	fd = 0;
 	while (i < ac)
 	{
-		if (ft_contains(av[i], ".cor"))
+		if (av[i][0] != '-')
 		{
 			if ((fd = open(av[i], O_RDONLY)) < 1)
 			{
-				col_str_fd(FRED, "Invalid File\t:\t", 1);
-				ft_putendl_fd(av[i], 1);
+				ft_putstr("Error opening champion file : ");
+				ft_putstr(av[i]);
+				ft_putstr("\n");
 				exit(1);
 			}
-			vm->champs[vm->num_champs].ldnbr = vm->num_champs;
 			vm->champs[vm->num_champs].number = vm->num_champs;
-			vm->champs[vm->num_champs].name = ft_strdup(av[i]);
-			ft_putendl_fd(vm->champs[vm->num_champs].name, 1);
+			vm->champs[vm->num_champs].path = ft_strdup(av[i]);
 			vm->num_champs++;
-			col_str_fd(FGRN, "Valid File\t:\t", 1);
-			ft_putendl_fd(av[i], 1);
 			close(fd);
 		}
 		if (ft_strequ(av[i], "-v"))
@@ -120,46 +99,6 @@ void	count_champs(t_vm *vm, int ac, char **av)
 	}
 }
 
-void	init(t_vm *vm)
-{
-	vm->num_champs = 0;
-	vm->first = NULL;
-	vm->total_cycles = 0;
-	vm->cycle = 0;
-	vm->cycle_to_die = CYCLE_TO_DIE;
-	vm->lives = 0;
-	vm->v = 0;
-	ft_bzero(vm->arena, MEM_SIZE);
-	ft_bzero(vm->colors, MEM_SIZE);
-	set_op_tab(vm);
-}
-
-void	puthex(char byte)
-{
-	char		*hex;
-
-	hex = "0123456789abcdef";
-	ft_putchar(hex[(byte & 0xf0) >> 4]);
-	ft_putchar(hex[(byte & 0x0f)]);
-}
-
-void	ft_putarena(unsigned char *arena, int size)
-{
-	int			index;
-
-	(void)size;
-	index = 0;
-	while (index < MEM_SIZE)
-	{
-		puthex(arena[index]);
-		index++;
-		if (index % 64 == 0)
-			ft_putchar('\n');
-		else
-			ft_putchar(' ');
-	}
-}
-
 void	place_player(t_vm *vm, int pnum)
 {
 	int			i;
@@ -167,9 +106,9 @@ void	place_player(t_vm *vm, int pnum)
 	t_champ		*ch;
 
 	ch = &vm->champs[pnum];
-	ch->fd = open(ch->name, O_RDONLY);
+	ch->fd = open(ch->path, O_RDONLY);
 	if (ch->fd > 0)
-		col_str_fd(FGRN, "champion exists : \n", 1);
+		ft_putstr("champion exists : \n");
 	else
 		exit(1);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
@@ -199,7 +138,7 @@ void	load_vm(t_vm *vm)
 	while (p < vm->num_champs)
 	{
 		printf("creating one player\n");
-		vm->champs[p].start = vm->champs[p].ldnbr * (MEM_SIZE / vm->num_champs);
+		vm->champs[p].start = vm->champs[p].number * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
 		cur->reg[0] = 0xffffffff - p;

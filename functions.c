@@ -37,10 +37,11 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 
 	(void)vm;
 	reg = cursor->params[1];
-	if (cursor->params[0] < 0)
-		cursor->params[0] = MEM_SIZE - (abs(cursor->params[0]) % IDX_MOD);	
+	cursor->reg[reg] = 0;
+	//if (cursor->params[0] < 0)
+	//	cursor->params[0] = MEM_SIZE - (abs(cursor->params[0]) % IDX_MOD);	
 	index = cursor->start + 2 + (cursor->params[0] % IDX_MOD);
-	cursor->reg[reg] = vm->arena[MEM(index + 0)] << 0;
+	cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 0);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 16);
 	cursor->reg[reg] += (vm->arena[MEM(index + 3)] << 24);

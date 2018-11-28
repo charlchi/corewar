@@ -19,18 +19,9 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# define BITS(x) {  printf("%d", x & 128 ? 1: 0);\
-					printf("%d", x & 64 ? 1: 0);\
-					printf("%d", x & 32 ? 1: 0);\
-					printf("%d", x & 16 ? 1: 0);\
-					printf("%d", x & 8 ? 1: 0);\
-					printf("%d", x & 4 ? 1: 0);\
-					printf("%d", x & 2 ? 1: 0);\
-					printf("%d", x & 1 ? 1: 0);\
-					printf("\n");}
 # define MEM(x) (x >= 0 ? (x % MEM_SIZE) : (MEM_SIZE - (abs(x) % MEM_SIZE)))
 # define IDX(x) (x >= 0 ? (x % IDX_MOD) : -((abs(x) % IDX_MOD)))
-# define DPRINT(x, ...) if (vm->v == -1) printf(x, ##__VA_ARGS__);
+# define DPRINT(x, ...) ((vm->v == -1) ? printf(x, ##__VA_ARGS__) : 0)
 
 typedef struct		s_process
 {
@@ -47,7 +38,6 @@ typedef struct		s_process
 	int				n;
 }					t_process;
 
-
 typedef struct  	s_champ
 {
     unsigned char	prog_name[PROG_NAME_LENGTH+4];
@@ -55,7 +45,7 @@ typedef struct  	s_champ
 	unsigned char	size[12];
 	unsigned char	*core;
 	unsigned char	magic[4];
-	char			*name;
+	char			*path;
 	int				ldnbr;
     unsigned int	number;
 	int				start_index;
@@ -81,19 +71,22 @@ typedef struct		s_vm
 	int				v;
 }					t_vm;
 
+/*		viz.c */
 void				init_viz(void);
 void				print_arena(t_vm *vm);
 void				print_cursors(t_vm *vm);
 void				print_info(t_vm *vm);
 void				print_vm(t_vm *vm);
+/*		corewar.c */
 void				run_vm(t_vm *vm);
-void				clear_cursor_params(t_process *orig);
-void				add_cursor(t_vm *vm, t_process *cursor);
-int					living_cursors(t_vm *vm);
-void				kill_cursors(t_vm *vm);
 void				execute_process(t_vm *vm, t_process *cursor);
+/*		cursors.c */
 t_process			*create_cursor(int i);
 t_process			*clone_cursor(t_process *orig, int pc);
+void				add_cursor(t_vm *vm, t_process *new);
+void				clear_cursor_params(t_process *cursor);
+void				kill_cursors(t_vm *vm);
+/*		xfunctions.c */
 void				cw_live(t_vm *vm, t_process *cursor);
 void				cw_ld(t_vm *vm, t_process *cursor);
 void				cw_st(t_vm *vm, t_process *cursor);
@@ -110,25 +103,18 @@ void				cw_lld(t_vm *vm, t_process *cursor);
 void				cw_lldi(t_vm *vm, t_process *cursor);
 void				cw_lfork(t_vm *vm, t_process *cursor);
 void				cw_aff(t_vm *vm, t_process *cursor);
-int					is_action(t_vm *vm, unsigned char c);
-void				col_endl_fd(char *colour, char *str, int fd);
-void				col_char_fd(char *colour, char c, int fd);
-void				col_str_fd(char *colour, char *str, int fd);
-void				ft_nbrendl_fd(int nbr, int fd);
-void				ft_nbrendl(int nbr);
-void				ft_putarr_fd(char **arr, int fd);
+/*		args.c */
+int					check_args_nocode(t_vm *vm, t_op *op, t_process *cursor);
+int					check_args(t_vm *vm, t_op *op, t_process *cursor);
+int					code_size(int code, int label_size);
+int					read_arg(t_vm *vm, int pos, int code, int label_size);
+/*		init */
 int					ft_contains(char *whole, char *part);
-void 				count_champs(t_vm *vm, int ac, char **av);
-void				init(t_vm *vm);
-void				puthex(char byte);
+void 				load_champs(t_vm *vm, int ac, char **av);
+void				init_vm(t_vm *vm);
 void				ft_putarena(unsigned char *arena, int size);
 void				place_player(t_vm *vm, int pnum);
 void				load_vm(t_vm *vm);
 void				set_op_tab(t_vm *vm);
-
-int					check_args(t_vm *vm, t_op *op, t_process *cursor);
-int					check_args_nocode(t_vm *vm, t_op *op, t_process *cursor);
-int					code_size(int code, int label_size);
-int					read_arg(t_vm *vm, int pos, int code, int label_size);
 
 #endif
