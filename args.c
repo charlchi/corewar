@@ -41,7 +41,7 @@ int		check_args(t_vm *vm, t_op *op, t_process *cursor)
 	i = -1;
 	while (++i < op->nargs)
 	{
-		code = ((vm->arena[MEM(cursor->pc + 1)] >> (6 - (i * 2))) & 3);
+		code = (((vm->arena[MEM(cursor->pc + 1)]) >> (6 - (i * 2))) & 3);
 		if (code == 3)
 			code++;
 		if ((op->argtype[i] & code) == 0)
@@ -73,12 +73,6 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 {
 	int			ret;
 
-	DPRINT("s_______\n");
-	DPRINT(" 0x%04x %02x\n", (MEM(pos - 2)), vm->arena[(MEM(pos - 2))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(pos - 1)), vm->arena[(MEM(pos - 1))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(pos + 0)), vm->arena[(MEM(pos + 0))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(pos + 1)), vm->arena[(MEM(pos + 1))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(pos + 2)), vm->arena[(MEM(pos + 2))]);
 	
 	if (code == T_REG)
 	{
@@ -86,17 +80,17 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 	}
 	else if (code == T_DIR && label_size == 0)
 	{
-		ret = vm->arena[MEM(pos + 3) << 0];
-		ret += (vm->arena[MEM(pos + 2)] << 8);
-		ret += (vm->arena[MEM(pos + 1)] << 16);
-		ret += (vm->arena[MEM(pos + 0)] << 24);
+		ret = vm->arena[MEM(pos + 3)] << 0;
+		ret += (vm->arena[MEM(pos + 2)]) << 8;
+		ret += (vm->arena[MEM(pos + 1)]) << 16;
+		ret += (vm->arena[MEM(pos + 0)]) << 24;
 	}
 	else
 	{
-		ret = (vm->arena[MEM(pos + 1)]) << 0;
+
+		ret = (vm->arena[MEM(pos + 1)]);
 		ret += (vm->arena[MEM(pos + 0)]) << 8;
 		ret = (short)ret;
 	}
-	DPRINT("^^^^^^^^^e\n");
 	return (ret);
 }

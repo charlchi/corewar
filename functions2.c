@@ -36,7 +36,7 @@ void	cw_and(t_vm *vm, t_process *cursor)
 		cursor->params[0] = cursor->reg[cursor->params[0]];
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
-	cursor->reg[reg] = cursor->params[1] & cursor->params[1];
+	cursor->reg[reg] = cursor->params[0] & cursor->params[1];
 	cursor->carry = !(cursor->reg[reg]);
 }
 
@@ -50,7 +50,7 @@ void	cw_or(t_vm *vm, t_process *cursor)
 		cursor->params[0] = cursor->reg[cursor->params[0]];
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
-	cursor->reg[reg] = cursor->params[1] | cursor->params[1];
+	cursor->reg[reg] = cursor->params[0] | cursor->params[1];
 	cursor->carry = !(cursor->reg[reg]);
 }
 
@@ -64,6 +64,6 @@ void	cw_xor(t_vm *vm, t_process *cursor)
 		cursor->params[0] = cursor->reg[cursor->params[0]];
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
-	cursor->reg[reg] = cursor->params[1] ^ cursor->params[1];
+	cursor->reg[reg] = cursor->params[0] ^ cursor->params[1];
 	cursor->carry = !(cursor->reg[reg]);
 }

@@ -57,5 +57,5 @@ void	cw_lfork(t_vm *vm, t_process *cursor)
 void	cw_aff(t_vm *vm, t_process *cursor)
 {
 	(void)vm;
-	printf("%c", cursor->reg[cursor->params[0]] % 256);
+	DPRINT("%c", cursor->reg[cursor->params[0]] % 256);
 }

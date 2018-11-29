@@ -71,9 +71,12 @@ void	print_cursors(t_vm *vm)
 	c = vm->first;
 	while (c) {
 		if (!c->dead_flag) {
-			y = 1 + c->start / 64;
-			x = 1+ (c->start % 64 * 2);
-			i = c->start;
+			y = 1 + MEM(c->start) / 64;
+			x = 1+ (MEM(c->start) % 64 * 2);
+			i = MEM(c->start);
+			i %= MEM_SIZE;
+			while (i < 0)
+				i += MEM_SIZE;
 			attron(COLOR_PAIR(5));
 			mvprintw(y, x, "%02x", vm->arena[i]);
 			attroff(COLOR_PAIR(5));

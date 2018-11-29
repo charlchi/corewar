@@ -39,6 +39,7 @@ void	init_vm(t_vm *vm)
 	vm->cycle_to_die = CYCLE_TO_DIE;
 	vm->lives = 0;
 	vm->v = 0;
+	vm->dump = -1;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
@@ -139,6 +140,7 @@ void	load_vm(t_vm *vm)
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
 		cur->reg[0] = 0xffffffff - p;
+		vm->champs[p].number = 0xffffffff - p;
 		i = 1;
 		while (i < 16)
 			cur->reg[i++] = 0;

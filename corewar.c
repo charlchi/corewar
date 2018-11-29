@@ -26,14 +26,13 @@ void	execute_process(t_vm *vm, t_process *c)
 {
 	int		op;
 
-
-	op = vm->arena[c->pc];
+	op = vm->arena[MEM(c->pc)];
 	if (c->waitcycles)
 	{
 		c->waitcycles--;
-		if (c->waitcycles == 0)
+		if (c->waitcycles == 0 && (op > 0 && op < 17))
 		{
-			op = vm->arena[c->start];
+			check_args(vm, &vm->op_tab[op], c);
 			DPRINT("P %4d | ", c->n);
 			DPRINT("%s ", vm->op_tab[op].name);
 			int i = -1;
@@ -58,32 +57,28 @@ void	execute_process(t_vm *vm, t_process *c)
 	else if ((op > 0 && op < 17))
 	{
 		clear_cursor_params(c);
-		if (check_args(vm, &vm->op_tab[op], c))
-		{
-			c->waitcycles = vm->op_tab[op].cycles - 1;
-		} else {
-			DPRINT("Skipping faulty arg %s\n", vm->op_tab[op].name);
-			c->pc++;
-		}
+		c->waitcycles = vm->op_tab[op].cycles - 1;
 	}
 	else
+	{
 		c->pc++;
+	}
 }
 
 void	run_vm(t_vm	*vm)
 {
-	char		ch;
+	char		c;
 	t_process	*cursor;
 
 	if (vm->v == 2)
 		init_viz();
 	vm->cycle = 1200;
-	while (vm->total_cycles != vm->dump && !((ch = getch()) >= 'a' && ch <= 'z'))
+	while (vm->total_cycles != vm->dump && !((c = getch()) >= 'a' && c <= 'z'))
 	{
 		if (vm->v == 2)
 		{
 			print_vm(vm);
-			usleep(2000);
+			//usleep(2000);
 		}
 		cursor = vm->first;
 		while (cursor)
@@ -105,13 +100,15 @@ void	run_vm(t_vm	*vm)
 		}
 		vm->total_cycles++;
 		vm->cycle--;
-		
+		int i = 0;
+		while (i < vm->num_champs)
 	}
 	if (vm->v == 2)
-		usleep(2000000);
+		usleep(500000);
+	endwin();
 	if (vm->total_cycles == vm->dump)
 		dump_vm(vm);
-	endwin();
+
 }
 
 void		dump_vm(t_vm *vm)
@@ -125,7 +122,7 @@ void		dump_vm(t_vm *vm)
 			printf("\n");
 		if (i % 64 == 0)
 			printf("0x%04x : ", i);
-		printf("%02x ", vm->arena[i]);
+		printf("%02x", vm->arena[i]);
 		i++;
 	}
 	printf("\n");

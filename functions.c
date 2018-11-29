@@ -43,14 +43,6 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 	val += (cursor->params[0] & 0x0000ff00) << 8;
 	val += (cursor->params[0] & 0x000000ff) << 24;
 	cursor->reg[reg] = val;	
-	//if (cursor->params[0] < 0)
-	//	cursor->params[0] = MEM_SIZE - (abs(cursor->params[0]) % IDX_MOD);	
-	//index = cursor->start + 2 + (cursor->params[0] % IDX_MOD);
-	//cursor->reg[reg] += (vm->arena[MEM(index + 0)] << 0);
-	//cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 8);
-	//cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 16);
-	//cursor->reg[reg] += (vm->arena[MEM(index + 3)] << 24);
-	//DPRINT(" | %08x", cursor->reg[reg]);
 	cursor->carry = !(cursor->reg[reg]);
 }
 
@@ -59,27 +51,7 @@ void	cw_st(t_vm *vm, t_process *cursor)
 	int				index;
 	int				reg;
 
-
-	50: 02 90 01 13 00 00 
-
-	 asdfasdf
-
-
-	DPRINT(" \n0x%04x %02x\n", (MEM(cursor->start + 0)), vm->arena[(MEM(cursor->start + 0))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(cursor->start + 1)), vm->arena[(MEM(cursor->start + 1))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(cursor->start + 2)), vm->arena[(MEM(cursor->start + 2))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(cursor->start + 3)), vm->arena[(MEM(cursor->start + 3))]);
-	DPRINT(" 0x%04x %02x\n", (MEM(cursor->start + 4)), vm->arena[(MEM(cursor->start + 4))]);
-	DPRINT(" [%08x]", cursor->params[0]);
-	DPRINT(" [%08x]", cursor->params[1]);
-	DPRINT(" %02x", vm->arena[cursor->start]);
-	DPRINT(" %02x", vm->arena[cursor->start+1]);
-	DPRINT(" %02x", vm->arena[cursor->start+2]);
-	DPRINT(" %02x", vm->arena[cursor->start+3]);
-	DPRINT(" %02x", vm->arena[cursor->start+4]);
 	reg = cursor->reg[cursor->params[0]];
-	DPRINT("                                        %d reg#", cursor->params[0] + 1);
-	DPRINT("  %08x val in reg", reg);
 	if (cursor->is_reg[1])
 		cursor->reg[cursor->params[1]] = reg;
 	else
@@ -88,11 +60,6 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		index %= MEM_SIZE;
 		while (index < 0)
 			index += MEM_SIZE;
-		DPRINT(" %d", MEM(index + 3));
-		DPRINT("/%d", MEM(index + 2));
-		DPRINT("/%d", MEM(index + 1));
-		DPRINT("/%d", MEM(index + 0));
-		DPRINT(" %d", index);
 		vm->arena[MEM(index + 3)] = (reg & 0xff000000) >> 24;
 		vm->arena[MEM(index + 2)] = (reg & 0x00ff0000) >> 16;
 		vm->arena[MEM(index + 1)] = (reg & 0x0000ff00) >> 8;

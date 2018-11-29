@@ -93,7 +93,9 @@ void			kill_cursors(t_vm *vm)
 	cursor = vm->first;
 	while (cursor)
 	{
-		cursor->dead_flag = !cursor->live_flag;
+		if (cursor->live_flag == 0)
+			cursor->dead_flag = 1;
+		cursor->live_flag = 0;
 		cursor = cursor->next;
 	}
 }
