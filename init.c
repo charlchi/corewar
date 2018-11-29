@@ -69,10 +69,26 @@ int		ft_contains(char *whole, char *part)
 	return (0);
 }
 
+void	count_champ(t_vm *vm, char *file)
+{
+	int		fd;
+
+	if ((fd = open(file, O_RDONLY)) < 1)
+	{
+		ft_putstr("Error opening champion file : ");
+		ft_putstr(file);
+		ft_putstr("\n");
+		exit(1);
+	}
+	vm->champs[vm->num_champs].number = vm->num_champs;
+	vm->champs[vm->num_champs].path = ft_strdup(file);
+	vm->num_champs++;
+	close(fd);
+}
+
 void	load_champs(t_vm *vm, int ac, char **av)
 {
 	int		i;
-	int		fd;
 
 	i = 1;
 	fd = 0;
@@ -80,23 +96,22 @@ void	load_champs(t_vm *vm, int ac, char **av)
 	{
 		if (av[i][0] != '-')
 		{
-			if ((fd = open(av[i], O_RDONLY)) < 1)
+			count_champ(vm, av[i]);
+			
+		}
+		if (ft_strcmp(av[i], "-n") == 0)
+		{
+			if (av[i + 1] == NULL || ft_atoi(av[i + 1]) == 0)
 			{
-				ft_putstr("Error opening champion file : ");
-				ft_putstr(av[i]);
-				ft_putstr("\n");
-				exit(1);
+				ft_putstr("Expected valid number after -n argument\n");
 			}
-			vm->champs[vm->num_champs].number = vm->num_champs;
-			vm->champs[vm->num_champs].path = ft_strdup(av[i]);
-			vm->num_champs++;
-			close(fd);
 		}
 		if (ft_strncmp(av[i], "-v", 2) == 0)
 			vm->v = atoi(&av[i][2]);
 		if (ft_strncmp(av[i], "-d", 2) == 0)
 			vm->dump = atoi(&av[i][2]);
 		i++;
+			}
 	}
 }
 
