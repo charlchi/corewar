@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   op.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2013/10/04 11:33:27 by zaz               #+#    #+#             */
-/*   Updated: 2018/09/24 12:33:31 by mgerber          ###   ########.fr       */
+/*   Created: 2018/11/30 16:42:42 by cmoller           #+#    #+#             */
+/*   Updated: 2018/11/30 16:42:44 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,10 @@
 
 typedef char	t_arg_type;
 
-# define T_REG					1 // 0001
-# define T_DIR					2 // 0010
-# define T_IND					4 // 0100
-# define T_LAB					8 // 1000
+# define T_REG					1
+# define T_DIR					2
+# define T_IND					4
+# define T_LAB					8
 
 # define PROG_NAME_LENGTH		(128)
 # define COMMENT_LENGTH			(2048)

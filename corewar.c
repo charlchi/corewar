@@ -65,43 +65,52 @@ void	execute_process(t_vm *vm, t_process *c)
 	}
 }
 
+void		execute_cursors(t_vm *vm)
+{
+	t_process	*cursor;
+	
+	cursor = vm->first;
+	while (cursor)
+	{
+		if (!cursor->dead_flag)
+			execute_process(vm, cursor);
+		cursor->pc = cursor->pc % MEM_SIZE;
+		cursor = cursor->next;
+	}
+}
+
+void		check_cursors(t_vm *vm)
+{
+	if (!vm->cycle)
+	{
+		if (vm->lives >= NBR_LIVE)
+		{
+			if (!(vm->cycle_to_die < CYCLE_DELTA))
+				vm->cycle_to_die -= CYCLE_DELTA;
+		}
+		vm->cycle = vm->cycle_to_die;
+		kill_cursors(vm);
+	}
+}
+
 void	run_vm(t_vm	*vm)
 {
 	char		c;
-	t_process	*cursor;
 
 	if (vm->v == 2)
 		init_viz();
-	vm->cycle = 1200;
 	while (vm->total_cycles != vm->dump && !((c = getch()) >= 'a' && c <= 'z'))
 	{
 		if (vm->v == 2)
-		{
 			print_vm(vm);
-			//usleep(2000);
-		}
-		cursor = vm->first;
-		while (cursor)
-		{
-			if (!cursor->dead_flag)
-				execute_process(vm, cursor);
-			cursor->pc = cursor->pc % MEM_SIZE;
-			cursor = cursor->next;
-		}
-		if (!vm->cycle)
-		{
-			if (vm->lives >= NBR_LIVE)
-			{
-				if (!(vm->cycle_to_die < CYCLE_DELTA))
-					vm->cycle_to_die -= CYCLE_DELTA;
-			}
-			vm->cycle = vm->cycle_to_die;
-			kill_cursors(vm);
-		}
+		execute_cursors(vm);
+		check_cursors(vm);
 		vm->total_cycles++;
 		vm->cycle--;
-		int i = 0;
-		while (i < vm->num_champs)
+		// todo remove dead champions
+		// if only one player alive: exit
+		//int i = 0;
+		//while (i < vm->num_champs)
 	}
 	if (vm->v == 2)
 		usleep(500000);

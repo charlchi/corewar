@@ -71,10 +71,10 @@ void	cw_sti(t_vm *vm, t_process *c)
 	vm->arena[MEM(index + 2)] = ((reg & 0x00ff0000) >> 16);
 	vm->arena[MEM(index + 1)] = ((reg & 0x0000ff00) >> 8);
 	vm->arena[MEM(index + 0)] = ((reg & 0x000000ff) >> 0);
-	vm->colors[MEM(index + 0)] = vm->colors[MEM(c->start)];
-	vm->colors[MEM(index + 1)] = vm->colors[MEM(c->start)];
-	vm->colors[MEM(index + 2)] = vm->colors[MEM(c->start)];
 	vm->colors[MEM(index + 3)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 2)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 1)] = vm->colors[MEM(c->start)];
+	vm->colors[MEM(index + 0)] = vm->colors[MEM(c->start)];
 }
 
 void	cw_fork(t_vm *vm, t_process *c)

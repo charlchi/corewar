@@ -40,6 +40,7 @@ void	init_vm(t_vm *vm)
 	vm->lives = 0;
 	vm->v = 0;
 	vm->dump = -1;
+	vm->cycle = vm->cycle_to_die;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
@@ -82,6 +83,8 @@ void	count_champ(t_vm *vm, char *file)
 	}
 	vm->champs[vm->num_champs].number = vm->num_champs;
 	vm->champs[vm->num_champs].path = ft_strdup(file);
+	vm->champs[vm->num_champs].last_live = 0;
+	vm->champs[vm->num_champs].lives = 0;
 	vm->num_champs++;
 	close(fd);
 }
@@ -91,27 +94,18 @@ void	load_champs(t_vm *vm, int ac, char **av)
 	int		i;
 
 	i = 1;
-	fd = 0;
 	while (i < ac)
 	{
 		if (av[i][0] != '-')
-		{
 			count_champ(vm, av[i]);
-			
-		}
 		if (ft_strcmp(av[i], "-n") == 0)
-		{
 			if (av[i + 1] == NULL || ft_atoi(av[i + 1]) == 0)
-			{
 				ft_putstr("Expected valid number after -n argument\n");
-			}
-		}
 		if (ft_strncmp(av[i], "-v", 2) == 0)
 			vm->v = atoi(&av[i][2]);
 		if (ft_strncmp(av[i], "-d", 2) == 0)
 			vm->dump = atoi(&av[i][2]);
 		i++;
-			}
 	}
 }
 
@@ -126,6 +120,11 @@ void	place_player(t_vm *vm, int pnum)
 	if (ch->fd < 1)
 		exit(1);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
+	if (*((unsigned int *)&ch->magic[0]) != 0xf383ea00)
+	{
+		ft_putendl("Not valid corewar champion!");
+		exit(0);
+	}
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
 	READ_ERR(ch->fd, ch->prog_comment, COMMENT_LENGTH + 4, "Invalid Comment");
@@ -155,7 +154,7 @@ void	load_vm(t_vm *vm)
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
 		cur->reg[0] = 0xffffffff - p;
-		vm->champs[p].number = 0xffffffff - p;
+		vm->champs[p].number = (0x00ffffff) + ((0xff - p) << 24);
 		i = 1;
 		while (i < 16)
 			cur->reg[i++] = 0;
@@ -163,9 +162,7 @@ void	load_vm(t_vm *vm)
 		place_player(vm, p);
 		ft_putstr("* Player ");
 		ft_putnbr(p + 1);
-		ft_putstr(", weighing ");
-		ft_putnbr(vm->champs[p].p_size);
-		ft_putstr(" bytes, ");
+		ft_putstr(", ");
 		ft_putstr((char *)vm->champs[p].prog_name);
 		ft_putstr("\n");
 		p++;

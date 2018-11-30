@@ -13,16 +13,6 @@
 #include "assembler.h"
 #include <stdio.h>
 
-int			is_label(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] != ' ' && str[i] != '\0')
-		i++;
-	return ((i > 0 && str[i - 1] == ':') ? 1 : 0);
-}
-
 t_labels	*new_label(char *str, int i)
 {
 	t_labels	*label;
@@ -30,7 +20,7 @@ t_labels	*new_label(char *str, int i)
 	label = (t_labels*)malloc(sizeof(t_labels));
 	label->name = ft_strdup(str);
 	ft_strchr(label->name, ':')[0] = '\0';
-	label->index = i;
+	label->index = i - 8;
 	label->next = NULL;
 	return (label);
 }
@@ -50,15 +40,6 @@ void		add_label(char *str, int i, t_labels **list)
 	}
 	else
 		*list = label;
-}
-
-int			instruction_val(t_parser *parser, char *str, int k)
-{
-	if (str[0] == 'r')
-		return (1);
-	if (str[0] == '%')
-		return (parser->op_tab[k].label_size ? DIR_SIZE / 2 : DIR_SIZE);
-	return (IND_SIZE);
 }
 
 int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)

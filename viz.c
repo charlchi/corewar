@@ -22,23 +22,29 @@ void	init_viz(void)
 	start_color();
 	use_default_colors();
 	init_pair(0, COLOR_WHITE, COLOR_RED);
+
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	init_pair(3, COLOR_GREEN, COLOR_BLACK);
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_BLACK, COLOR_WHITE);
+
+	init_pair(5, COLOR_BLACK, COLOR_RED);
+	init_pair(6, COLOR_BLACK, COLOR_BLUE);
+	init_pair(7, COLOR_BLACK, COLOR_GREEN);
+	init_pair(8, COLOR_BLACK, COLOR_CYAN);
+
+	init_pair(9, COLOR_WHITE, COLOR_BLACK);
 }
 
 void	print_arena(t_vm *vm)
 {
 	int			i;
 
+	attron(A_STANDOUT);
 	i = -1;
-	attron(COLOR_PAIR(5));
 	while (++i < 64*2 + 2)
 		printw(" ");
 	printw("\n ");
-	attroff(COLOR_PAIR(5));
 	i = 0;	
 	while (i < 64 * 64) {
 		attron(COLOR_PAIR(vm->colors[i]));
@@ -47,18 +53,14 @@ void	print_arena(t_vm *vm)
 		i++;
 		if (i != 0 && i % 64 == 0)
 		{
-			attron(COLOR_PAIR(5));
 			printw(" \n ");
-			attroff(COLOR_PAIR(5));
 		}
 	}
 	i = -1;
-	attron(COLOR_PAIR(5));
 	while (++i < 64*2 + 1)
 		printw(" ");
-	attroff(COLOR_PAIR(5));
-	i = -1;
 	printw("\n");
+	attroff(A_STANDOUT);
 }
 
 void	print_cursors(t_vm *vm)
@@ -77,9 +79,11 @@ void	print_cursors(t_vm *vm)
 			i %= MEM_SIZE;
 			while (i < 0)
 				i += MEM_SIZE;
-			attron(COLOR_PAIR(5));
+			attron(A_BOLD);
+			attron(COLOR_PAIR(vm->colors[i]));
 			mvprintw(y, x, "%02x", vm->arena[i]);
-			attroff(COLOR_PAIR(5));
+			attroff(COLOR_PAIR(vm->colors[i]));
+			attroff(A_BOLD);
 			//mvprintw(0, 0, "");
 		}
 		c = c->next;
@@ -88,10 +92,30 @@ void	print_cursors(t_vm *vm)
 
 void	print_info(t_vm *vm)
 {
-	mvprintw(1, 2 + 64 * 2, "%8d cycle\n", vm->cycle);
-	mvprintw(2, 2 + 64 * 2, "%8d total_cycles\n", vm->total_cycles);
-	mvprintw(3, 2 + 64 * 2, "%8d lives\n", vm->lives);
-	mvprintw(4, 2 + 64 * 2, "%8d cycle_to_die\n", vm->cycle_to_die);
+	int		i;
+	int		x;
+
+	x = 3 + 64 * 2;
+	attron(A_BOLD);
+	i = -1;
+	while (++i < vm->num_champs)
+	{
+		attron(COLOR_PAIR(1 + i));
+		attron(A_UNDERLINE);
+		mvprintw(i * 4 + 12, x, " Player %4d:               \n", i + 1);
+		attroff(A_UNDERLINE);
+		mvprintw(i * 4 + 13, x, "        Last live: %8d ", vm->champs[i].last_live);
+		mvprintw(i * 4 + 14, x, " Lives this cycle: %8d ", vm->champs[i].lives);
+		attroff(COLOR_PAIR(1 + i));
+	}
+	attron(A_UNDERLINE);
+	mvprintw(i * 4 + 16, x, " VM                        \n", vm->cycle);
+	attroff(A_UNDERLINE);
+	mvprintw(i * 4 + 17, x, "    Current cycle:%8d  \n", vm->cycle);
+	mvprintw(i * 4 + 18, x, "     Total cycles:%8d  \n", vm->total_cycles);
+	mvprintw(i * 4 + 19, x, " Lives this cycle:%8d  \n", vm->lives);
+	mvprintw(i * 4 + 20, x, "     Cycle to die:%8d  \n", vm->cycle_to_die);
+	attroff(A_BOLD);
 }
 
 void	print_vm(t_vm *vm)
@@ -101,86 +125,5 @@ void	print_vm(t_vm *vm)
 	print_arena(vm);
 	print_info(vm);
 	print_cursors(vm);
+	usleep(500);
 }
-/*
-
-#include "libft/libft.h"
-#include "corewar.h"
-
-void	init_viz(void)
-{
-	initscr();
-	noecho();
-	nodelay(stdscr, TRUE);
-	clear();
-	start_color();
-	use_default_colors();
-	init_pair(0, COLOR_WHITE, COLOR_RED);
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-	init_pair(2, COLOR_BLUE, COLOR_BLACK);
-	init_pair(3, COLOR_GREEN, COLOR_BLACK);
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_BLACK, COLOR_GREEN);
-}
-
-void	print_arena(t_vm *vm)
-{
-	int			i;
-
-	i = 0;
-	printw("\n");
-	while (i < 64 * 64) {
-		printw(" ");
-		attron(COLOR_PAIR(vm->colors[i]));
-		printw("%02x", vm->arena[i]);
-		attroff(COLOR_PAIR(vm->colors[i]));
-		i++;
-		if (i != 0 && i % 64 == 0)
-		{
-			printw(" %02", i);
-			printw("\n");
-		}
-	}
-	
-}
-
-void	print_cursors(t_vm *vm)
-{
-	t_process	*c;
-	int			x;
-	int			y;
-	int			i;
-
-	c = vm->first;
-	while (c) {
-		if (!c->dead_flag) {
-			x = 1 + c->start / 64;
-			y = 1 + (c->start % 64 * 3);
-			//i = c->waitcycles ? c->start : c->pc;
-			i = c->start;
-			attron(COLOR_PAIR(5));
-			mvprintw(x, y, "%02x", vm->arena[i]);
-			attroff(COLOR_PAIR(5));
-			mvprintw(0, 0, "");
-		}
-		c = c->next;
-	}
-}
-
-void	print_info(t_vm *vm)
-{
-	mvprintw(66, 0, "%8d cycle", vm->cycle);
-	mvprintw(67, 0, "%8d total_cycles", vm->total_cycles);
-	mvprintw(68, 0, "%8d lives", vm->lives);
-	mvprintw(69, 0, "%8d cycle_to_die", vm->cycle_to_die);
-}
-
-void	print_vm(t_vm *vm)
-{
-	refresh();
-	erase();
-	print_arena(vm);
-	print_cursors(vm);
-	print_info(vm);
-}
-*/
