@@ -15,15 +15,21 @@
 void	cw_live(t_vm *vm, t_process *cursor)
 {
 	int				i;
+	int				n;
 
 	i = 0;
 	while (i < vm->num_champs)
 	{
-		if ((int)vm->champs[i].number == cursor->params[0])
+		n = (cursor->params[0] & 0xff000000) >> 24;
+		n += (cursor->params[0] & 0x00ff0000) >> 8;
+		n += (cursor->params[0] & 0x0000ff00) << 8;
+		n += (cursor->params[0] & 0x000000ff) << 24;
+		if ((int)vm->champs[i].number == n)
 		{
 			vm->champs[i].lives++;
 			vm->lives++;
 			vm->champs[i].last_live = vm->total_cycles;
+			vm->last_livep = i;
 		}
 		i++;
 	}
@@ -42,7 +48,7 @@ void	cw_ld(t_vm *vm, t_process *cursor)
 	val += (cursor->params[0] & 0x00ff0000) >> 8;
 	val += (cursor->params[0] & 0x0000ff00) << 8;
 	val += (cursor->params[0] & 0x000000ff) << 24;
-	cursor->reg[reg] = val;	
+	cursor->reg[reg] = val;
 	cursor->carry = !(cursor->reg[reg]);
 }
 
@@ -56,6 +62,7 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		cursor->reg[cursor->params[1]] = reg;
 	else
 	{
+		
 		index = cursor->start + cursor->params[1] % IDX_MOD;
 		index %= MEM_SIZE;
 		while (index < 0)
@@ -68,6 +75,7 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start)];
+		
 	}
 }
 

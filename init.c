@@ -42,6 +42,7 @@ void	init_vm(t_vm *vm)
 	vm->v = 0;
 	vm->dump = -1;
 	vm->cycle = vm->cycle_to_die;
+	vm->nolive = 0;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
@@ -154,15 +155,15 @@ void	load_vm(t_vm *vm)
 		vm->champs[p].start = vm->champs[p].number * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
-		cur->reg[0] = 0xffffffff - p;
-		vm->champs[p].number = (0x00ffffff) + ((0xff - p) << 24);
+		cur->reg[0] = p;
+		vm->champs[p].number = p;
 		i = 1;
 		while (i < 16)
 			cur->reg[i++] = 0;
 		add_cursor(vm, cur);
 		place_player(vm, p);
 		ft_putstr("* Player ");
-		ft_putnbr(p + 1);
+		ft_putnbr(p);
 		ft_putstr(", ");
 		ft_putstr((char *)vm->champs[p].prog_name);
 		ft_putstr("\n");

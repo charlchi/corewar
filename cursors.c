@@ -27,9 +27,6 @@ void			add_cursor(t_vm *vm, t_process *new)
 		vm->first = new;
 		vm->first->n = curr->n + 1;
 		vm->first->next = curr;
-		//while (curr->next)
-		//	curr = curr->next;
-		//curr->next = cursor;
 	}
 }
 
@@ -89,13 +86,22 @@ void			clear_cursor_params(t_process *cursor)
 void			kill_cursors(t_vm *vm)
 {
 	t_process	*cursor;
+	int			dead;
+	int			total;
 
+	dead = 0;
+	total = 0;
 	cursor = vm->first;
 	while (cursor)
 	{
 		if (cursor->live_flag == 0)
 			cursor->dead_flag = 1;
+		if (cursor->dead_flag == 1)
+			dead++;
+		total++;
 		cursor->live_flag = 0;
 		cursor = cursor->next;
 	}
+	if (dead == total)
+		vm->nolive = 1;
 }

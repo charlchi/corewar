@@ -34,11 +34,12 @@ void	print_arena(t_vm *vm)
 	int			i;
 
 	i = -1;
-	while (++i < 64*2 + 2)
+	while (++i < 64 * 2 + 2)
 		printw(" ");
 	printw("\n ");
-	i = 0;	
-	while (i < 64 * 64) {
+	i = 0;
+	while (i < 64 * 64)
+	{
 		attron(COLOR_PAIR(vm->colors[i]));
 		printw("%02x", vm->arena[i]);
 		attroff(COLOR_PAIR(vm->colors[i]));
@@ -49,7 +50,7 @@ void	print_arena(t_vm *vm)
 		}
 	}
 	i = -1;
-	while (++i < 64*2 + 1)
+	while (++i < 64 * 2 + 1)
 		printw(" ");
 	printw("\n");
 }
@@ -58,24 +59,24 @@ void	print_cursors(t_vm *vm)
 {
 	t_process	*c;
 	int			i;
-	int			y;
 	int			x;
 
 	c = vm->first;
-	while (c) {
-		if (!c->dead_flag) {
-			y = 1 + MEM(c->start) / 64;
+	while (c)
+	{
+		if (!c->dead_flag)
+		{
 			x = 1 + (MEM(c->start) % 64 * 2);
 			i = MEM(c->start);
-			i %= MEM_SIZE;
-			while (i < 0)
-				i += MEM_SIZE;
 			attron(A_BOLD);
 			attron(COLOR_PAIR(9));
-			mvprintw(y, x, "%02x", vm->arena[i]);
+			if (vm->arena[i] == 0 && !c->waitcycles)
+				mvprintw(1 + MEM(c->pc) / 64, 1 + (MEM(c->pc) % 64 * 2),
+					"%02x", vm->arena[i]);
+			else
+				mvprintw(1 + MEM(c->start) / 64, x, "%02x", vm->arena[i]);
 			attroff(COLOR_PAIR(9));
 			attroff(A_BOLD);
-			//mvprintw(0, 0, "");
 		}
 		c = c->next;
 	}
@@ -87,7 +88,6 @@ void	print_info(t_vm *vm)
 	int			x;
 
 	x = 3 + 64 * 2;
-	attron(A_BOLD);
 	i = -1;
 	while (++i < vm->num_champs)
 	{
@@ -95,8 +95,10 @@ void	print_info(t_vm *vm)
 		attron(A_UNDERLINE);
 		mvprintw(i * 4 + 1, x, " Player %4d:               \n", i + 1);
 		attroff(A_UNDERLINE);
-		mvprintw(i * 4 + 2, x, "        Last live: %8d ", vm->champs[i].last_live);
-		mvprintw(i * 4 + 3, x, " Lives this cycle: %8d ", vm->champs[i].lives);
+		mvprintw(i * 4 + 2, x, "        Last live: %8d ",
+			vm->champs[i].last_live);
+		mvprintw(i * 4 + 3, x, " Lives this cycle: %8d ",
+			vm->champs[i].lives);
 		attroff(COLOR_PAIR(1 + i));
 	}
 	attron(A_UNDERLINE);
@@ -106,7 +108,7 @@ void	print_info(t_vm *vm)
 	mvprintw(i * 4 + 6, x, "     Total cycles:%8d  \n", vm->total_cycles);
 	mvprintw(i * 4 + 7, x, " Lives this cycle:%8d  \n", vm->lives);
 	mvprintw(i * 4 + 8, x, "     Cycle to die:%8d  \n", vm->cycle_to_die);
-	attroff(A_BOLD);
+	mvprintw(i * 4 + 9, x, "           Checks:%8d  \n", vm->checks);
 }
 
 void	print_vm(t_vm *vm)
@@ -116,5 +118,5 @@ void	print_vm(t_vm *vm)
 	print_arena(vm);
 	print_info(vm);
 	print_cursors(vm);
-	//usleep(500);
+	//usleep(200);
 }

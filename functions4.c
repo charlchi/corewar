@@ -35,8 +35,11 @@ void	cw_lldi(t_vm *vm, t_process *cursor)
 		cursor->params[0] = cursor->reg[cursor->params[0]];
 	if (cursor->is_reg[1])
 		cursor->params[1] = cursor->reg[cursor->params[1]];
-	reg = cursor->reg[cursor->params[2]];
+	reg = cursor->params[2];
 	index = MEM(cursor->start + 2 + (cursor->params[0] + cursor->params[1]));
+	index %= MEM_SIZE;
+	while (index < 0)
+		index += MEM_SIZE;
 	cursor->reg[reg] = (vm->arena[MEM(index + 3)] << 0);
 	cursor->reg[reg] += (vm->arena[MEM(index + 2)] << 8);
 	cursor->reg[reg] += (vm->arena[MEM(index + 1)] << 16);

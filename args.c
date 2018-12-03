@@ -42,8 +42,7 @@ int		check_args(t_vm *vm, t_op *op, t_process *cursor)
 	while (++i < op->nargs)
 	{
 		code = (((vm->arena[MEM(cursor->pc + 1)]) >> (6 - (i * 2))) & 3);
-		if (code == 3)
-			code++;
+		code += (code == 3 ? 1 : 0);
 		if ((op->argtype[i] & code) == 0)
 			return (0);
 		if ((code == T_REG && (vm->arena[MEM(read)] < 1
@@ -73,7 +72,6 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 {
 	int			ret;
 
-	
 	if (code == T_REG)
 	{
 		ret = vm->arena[MEM(pos)] - 1;

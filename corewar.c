@@ -13,19 +13,30 @@
 #include "libft/libft.h"
 #include "corewar.h"
 
-t_vm	*g_vm;
-
-static void	(*g_cw_funcs[16])(t_vm *vm, t_process *cursor) = {
-	cw_live, cw_ld, cw_st, cw_add,
-	cw_sub, cw_and, cw_or, cw_xor,
-	cw_zjmp, cw_ldi, cw_sti, cw_fork,
-	cw_lld, cw_lldi, cw_lfork, cw_aff
+static		void(*g_cw_funcs[16])(t_vm *vm, t_process *cursor) = {
+	cw_live,
+	cw_ld,
+	cw_st,
+	cw_add,
+	cw_sub,
+	cw_and,
+	cw_or,
+	cw_xor,
+	cw_zjmp,
+	cw_ldi,
+	cw_sti,
+	cw_fork,
+	cw_lld,
+	cw_lldi,
+	cw_lfork,
+	cw_aff
 };
 
-void	execute_process(t_vm *vm, t_process *c)
+void		execute_process(t_vm *vm, t_process *c)
 {
 	int			op;
-	
+	int			i;
+
 	c->waitcycles--;
 	op = vm->arena[MEM(c->pc)];
 	if (c->waitcycles == 0 && (op > 0 && op < 17))
@@ -34,7 +45,7 @@ void	execute_process(t_vm *vm, t_process *c)
 		check_args(vm, &vm->op_tab[op], c);
 		DPRINT("P %4d | ", c->n);
 		DPRINT("%s ", vm->op_tab[op].name);
-		int i = -1;
+		i = -1;
 		while (++i < vm->op_tab[op].nargs)
 			c->is_reg[i] ? DPRINT("r%d ", c->params[i] + 1)
 			: DPRINT("%d ", c->params[i]);
@@ -51,16 +62,19 @@ void	execute_process(t_vm *vm, t_process *c)
 }
 
 void		execute_cursors(t_vm *vm)
-{	
+{
 	int			op;
 	t_process	*c;
-	
+
 	c = vm->first;
 	while (c)
 	{
+		DPRINT("ff\n");
 		if (!c->dead_flag)
 		{
+			DPRINT("%d\n", MEM(c->pc));
 			op = vm->arena[MEM(c->pc)];
+			DPRINT("op %d\n", op);
 			if (c->waitcycles)
 				execute_process(vm, c);
 			else if ((op > 0 && op < 17))
@@ -70,19 +84,23 @@ void		execute_cursors(t_vm *vm)
 			c->pc = c->pc % MEM_SIZE;
 		}
 		c = c->next;
+		DPRINT("gg\n");
 	}
+	
 }
 
 void		check_cursors(t_vm *vm)
 {
 	int			i;
+	int			live;
 
-	vm->checks++;
+	live = 0;
 	if (!vm->cycle)
 	{
-		if (vm->lives >= NBR_LIVE)
+		vm->checks++;
+		if (vm->lives >= NBR_LIVE || vm->checks == 10)
 		{
-			if (!(vm->cycle_to_die < CYCLE_DELTA))
+			if (!(vm->cycle_to_die < CYCLE_DELTA) || vm->checks == 10)
 			{
 				vm->checks = 0;
 				vm->cycle_to_die -= CYCLE_DELTA;
@@ -97,7 +115,19 @@ void		check_cursors(t_vm *vm)
 	}
 }
 
-void	run_vm(t_vm	*vm)
+void		print_winner(t_vm *vm)
+{
+	t_champ		ch;
+
+	ch = vm->champs[vm->last_livep];
+	ft_putstr("Contestant ");
+	ft_putstr(ft_itoa(ch.number));
+	ft_putstr(", \"");
+	ft_putstr((char *)&ch.prog_name[0]);
+	ft_putstr("\", has won !\n");
+}
+
+void		run_vm(t_vm *vm)
 {
 	char		c;
 
@@ -105,23 +135,30 @@ void	run_vm(t_vm	*vm)
 		init_viz();
 	while (vm->total_cycles != vm->dump && !((c = getch()) >= 'a' && c <= 'z'))
 	{
-		if (vm->v == 2 && vm->total_cycles % 1000 == 0)
+		if (vm->v == 2)
 			print_vm(vm);
+		DPRINT("executing\n");
 		execute_cursors(vm);
+		DPRINT("done, checking\n");
 		check_cursors(vm);
+		DPRINT("done\n");
 		vm->total_cycles++;
 		vm->cycle--;
-		// todo remove dead champions
-		// if only one player alive: exit
-		//int i = 0;
-		//while (i < vm->num_champs)
+		if (vm->cycle < 0 || vm->nolive == 1)
+			break ;
+		DPRINT("1cycle\n");
 	}
+	DPRINT("Game Ended\n");
 	if (vm->v == 2)
-		usleep(500000);
-	endwin();
+	{
+		endwin();
+		usleep(50000);
+	}
 	if (vm->total_cycles == vm->dump)
 		dump_vm(vm);
-
+	else
+		print_winner(vm);
+	exit(0);
 }
 
 void		dump_vm(t_vm *vm)
