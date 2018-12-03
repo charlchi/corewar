@@ -38,6 +38,7 @@ void	init_vm(t_vm *vm)
 	vm->cycle = 0;
 	vm->cycle_to_die = CYCLE_TO_DIE;
 	vm->lives = 0;
+	vm->checks = 0;
 	vm->v = 0;
 	vm->dump = -1;
 	vm->cycle = vm->cycle_to_die;

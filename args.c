@@ -87,7 +87,6 @@ int		read_arg(t_vm *vm, int pos, int code, int label_size)
 	}
 	else
 	{
-
 		ret = (vm->arena[MEM(pos + 1)]);
 		ret += (vm->arena[MEM(pos + 0)]) << 8;
 		ret = (short)ret;

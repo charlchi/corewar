@@ -67,6 +67,7 @@ typedef struct		s_vm
 	int				total_cycles;
 	int				cycle;
 	int				cycle_to_die;
+	int				checks;
 	int				lives;
 	int				v;
 	int				dump;

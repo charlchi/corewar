@@ -53,7 +53,6 @@ void	cw_sti(t_vm *vm, t_process *c)
 {
 	int				index;
 	int				reg;
-	int				v;
 
 	reg = c->reg[c->params[0]];
 	if (c->is_reg[1])
@@ -66,7 +65,6 @@ void	cw_sti(t_vm *vm, t_process *c)
 	while (index < 0)
 		index += MEM_SIZE;
 	DPRINT("\n       | -> store acb[%02x] ", vm->arena[MEM(c->start + 1)]);
-	v = vm->arena[MEM(c->start + 1)];
 	vm->arena[MEM(index + 3)] = ((reg & 0xff000000) >> 24);
 	vm->arena[MEM(index + 2)] = ((reg & 0x00ff0000) >> 16);
 	vm->arena[MEM(index + 1)] = ((reg & 0x0000ff00) >> 8);
