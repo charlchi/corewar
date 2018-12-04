@@ -42,22 +42,28 @@ void		execute_process(t_vm *vm, t_process *c)
 	if (c->waitcycles == 0 && (op > 0 && op < 17))
 	{
 		clear_cursor_params(c);
-		check_args(vm, &vm->op_tab[op], c);
-		DPRINT("P %4d | ", c->n);
-		DPRINT("%s ", vm->op_tab[op].name);
-		i = -1;
-		while (++i < vm->op_tab[op].nargs)
-			c->is_reg[i] ? DPRINT("r%d ", c->params[i] + 1)
-			: DPRINT("%d ", c->params[i]);
-		g_cw_funcs[op - 1](vm, c);
-		DPRINT("\n");
-		DPRINT("ADV %d ", c->pc - c->start);
-		DPRINT("(0x%04x -> 0x%04x) ", c->start, c->pc);
-		i = c->start - 1;
-		while (++i < c->pc)
-			DPRINT("%02x ", vm->arena[MEM(i)]);
-		DPRINT("\n");
-		c->start = c->pc;
+		DPRINT("CHECKING ARGS\n");
+		if (check_args(vm, &vm->op_tab[op], c))
+		{
+			DPRINT("P %4d | ", c->n);
+			DPRINT("%s ", vm->op_tab[op].name);
+			i = -1;
+			while (++i < vm->op_tab[op].nargs)
+				c->is_reg[i] ? DPRINT("r%d ", c->params[i] + 1)
+				: DPRINT("%d ", c->params[i]);
+			g_cw_funcs[op - 1](vm, c);
+			DPRINT("\n");
+			DPRINT("ADV %d ", c->pc - c->start);
+			DPRINT("(0x%04x -> 0x%04x) ", c->start, c->pc);
+
+			DPRINT(" (%d -> %d) ", c->start, c->pc);
+			i = MEM(c->start - 1);
+			while (++i < MEM(c->pc))
+				DPRINT("%02x ", vm->arena[MEM(i)]);
+			DPRINT("\n");
+			c->start = c->pc;
+		}
+		DPRINT("hi\n");
 	}
 }
 
@@ -78,6 +84,7 @@ void		execute_cursors(t_vm *vm)
 				c->waitcycles = vm->op_tab[op].cycles - 1;
 			else
 				c->pc++;
+			DPRINT("GG\n");
 			c->pc = c->pc % MEM_SIZE;
 		}
 		c = c->next;
@@ -107,6 +114,7 @@ void		print_winner(t_vm *vm)
 {
 	t_champ		ch;
 
+	DPRINT("%u\n", (unsigned int)vm->last_livep);
 	ch = vm->champs[vm->last_livep];
 	ft_putstr("Contestant ");
 	ft_putstr(ft_itoa(ch.number));
