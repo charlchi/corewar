@@ -14,6 +14,7 @@
 
 #define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) \
 	{ft_putendl(str); exit(0);}
+#define ERRP(x) {ft_putstr(x); exit(0);}
 
 int		main(int ac, char **av)
 {
@@ -43,6 +44,7 @@ void	init_vm(t_vm *vm)
 	vm->dump = -1;
 	vm->cycle = vm->cycle_to_die;
 	vm->nolive = 0;
+	vm->n = -1;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
@@ -83,7 +85,12 @@ void	count_champ(t_vm *vm, char *file)
 		ft_putstr("\n");
 		exit(1);
 	}
-	vm->champs[vm->num_champs].number = vm->num_champs;
+	if (vm->n != -1 && vm->n < 4)
+		ERRP("Player numbers must be larger than 4\n");
+	if (vm->n > 4)
+		vm->champs[vm->num_champs].number = vm->n;
+	else
+		vm->champs[vm->num_champs].number = vm->num_champs;
 	vm->champs[vm->num_champs].path = ft_strdup(file);
 	vm->champs[vm->num_champs].last_live = 0;
 	vm->champs[vm->num_champs].lives = 0;
@@ -95,19 +102,27 @@ void	load_champs(t_vm *vm, int ac, char **av)
 {
 	int		i;
 
-	i = 1;
-	while (i < ac)
+	i = 0;
+	while (++i < ac)
 	{
 		if (av[i][0] != '-')
 			count_champ(vm, av[i]);
+		vm->n = -1;
 		if (ft_strcmp(av[i], "-n") == 0)
-			if (av[i + 1] == NULL || ft_atoi(av[i + 1]) == 0)
-				ft_putstr("Expected valid number after -n argument\n");
+		{
+			i++;
+			if (av[i] == NULL || (vm->n = ft_atoi(av[i])) == 0)
+				ERRP("Expected valid number after -n argument\n");
+		}
 		if (ft_strncmp(av[i], "-v", 2) == 0)
-			vm->v = atoi(&av[i][2]);
-		if (ft_strncmp(av[i], "-d", 2) == 0)
-			vm->dump = atoi(&av[i][2]);
-		i++;
+			if ((vm->v = atoi(&av[i][2])) <= 0 || vm->v > 2)
+				ERRP("Invalid number after -v\n");
+		if (ft_strncmp(av[i], "-dump", 5) == 0)
+		{
+			i++;
+			if (av[i] == NULL || (vm->dump = atoi(av[i])) == 0)
+				ERRP("Expected valid number after -dump argument\n");
+		}
 	}
 }
 
@@ -152,7 +167,7 @@ void	load_vm(t_vm *vm)
 	ft_putstr("Introducing contestants...\n");
 	while (p < vm->num_champs)
 	{
-		vm->champs[p].start = vm->champs[p].number * (MEM_SIZE / vm->num_champs);
+		vm->champs[p].start = p * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
 		cur->reg[0] = p;

@@ -91,10 +91,6 @@ void		execute_cursors(t_vm *vm)
 
 void		check_cursors(t_vm *vm)
 {
-	int			i;
-	int			live;
-
-	live = 0;
 	if (!vm->cycle)
 	{
 		vm->checks++;
@@ -109,9 +105,6 @@ void		check_cursors(t_vm *vm)
 		}
 		vm->cycle = vm->cycle_to_die;
 		kill_cursors(vm);
-		i = -1;
-		while (++i < vm->num_champs)
-			vm->champs[i].lives = 0;
 	}
 }
 

@@ -88,6 +88,7 @@ void			kill_cursors(t_vm *vm)
 	t_process	*cursor;
 	int			dead;
 	int			total;
+	int			i;
 
 	dead = 0;
 	total = 0;
@@ -104,4 +105,7 @@ void			kill_cursors(t_vm *vm)
 	}
 	if (dead == total)
 		vm->nolive = 1;
+	i = -1;
+	while (++i < vm->num_champs)
+		vm->champs[i].lives = 0;
 }

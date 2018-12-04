@@ -73,6 +73,7 @@ typedef struct		s_vm
 	int				dump;
 	int				nolive;
 	int				last_livep;
+	int				n;
 }					t_vm;
 
 /*		viz.c */
