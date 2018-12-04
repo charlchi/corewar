@@ -62,7 +62,6 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		cursor->reg[cursor->params[1]] = reg;
 	else
 	{
-		
 		index = cursor->start + cursor->params[1] % IDX_MOD;
 		index %= MEM_SIZE;
 		while (index < 0)
@@ -75,7 +74,6 @@ void	cw_st(t_vm *vm, t_process *cursor)
 		vm->colors[MEM(index + 2)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 1)] = vm->colors[MEM(cursor->start)];
 		vm->colors[MEM(index + 0)] = vm->colors[MEM(cursor->start)];
-		
 	}
 }
 

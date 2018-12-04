@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   corewar.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/17 11:42:54 by agabrie           #+#    #+#             */
-/*   Updated: 2018/09/21 09:17:48 by mgerber          ###   ########.fr       */
+/*   Created: 2018/12/04 14:06:25 by cmoller           #+#    #+#             */
+/*   Updated: 2018/12/04 14:06:27 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,9 @@ void		execute_cursors(t_vm *vm)
 	c = vm->first;
 	while (c)
 	{
-		DPRINT("ff\n");
 		if (!c->dead_flag)
 		{
-			DPRINT("%d\n", MEM(c->pc));
 			op = vm->arena[MEM(c->pc)];
-			DPRINT("op %d\n", op);
 			if (c->waitcycles)
 				execute_process(vm, c);
 			else if ((op > 0 && op < 17))
@@ -84,9 +81,7 @@ void		execute_cursors(t_vm *vm)
 			c->pc = c->pc % MEM_SIZE;
 		}
 		c = c->next;
-		DPRINT("gg\n");
 	}
-	
 }
 
 void		check_cursors(t_vm *vm)
@@ -130,18 +125,13 @@ void		run_vm(t_vm *vm)
 	{
 		if (vm->v == 2)
 			print_vm(vm);
-		DPRINT("executing\n");
 		execute_cursors(vm);
-		DPRINT("done, checking\n");
 		check_cursors(vm);
-		DPRINT("done\n");
 		vm->total_cycles++;
 		vm->cycle--;
 		if (vm->cycle < 0 || vm->nolive == 1)
 			break ;
-		DPRINT("1cycle\n");
 	}
-	DPRINT("Game Ended\n");
 	if (vm->v == 2)
 	{
 		endwin();
@@ -152,21 +142,4 @@ void		run_vm(t_vm *vm)
 	else
 		print_winner(vm);
 	exit(0);
-}
-
-void		dump_vm(t_vm *vm)
-{
-	int			i;
-
-	i = 0;
-	while (i < MEM_SIZE)
-	{
-		if (i != 0 && i % 64 == 0)
-			printf("\n");
-		if (i % 64 == 0)
-			printf("0x%04x : ", i);
-		printf("%02x", vm->arena[i]);
-		i++;
-	}
-	printf("\n");
 }

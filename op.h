@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   op.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2013/10/04 11:33:27 by zaz               #+#    #+#             */
-/*   Updated: 2018/09/20 13:28:58 by mgerber          ###   ########.fr       */
+/*   Created: 2018/12/04 15:04:39 by cmoller           #+#    #+#             */
+/*   Updated: 2018/12/04 15:04:45 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 # define REG_SIZE				4
 # define DIR_SIZE				REG_SIZE
 
-# define REG_CODE				1 // 01
-# define DIR_CODE				2 // 10
-# define IND_CODE				3 // 11
+# define REG_CODE				1
+# define DIR_CODE				2
+# define IND_CODE				3
 
 # define MAX_ARGS_NUMBER		4
 # define MAX_PLAYERS			4
@@ -46,9 +46,9 @@
 
 typedef char	t_arg_type;
 
-# define T_REG					1 // 001
-# define T_DIR					2 // 010
-# define T_IND					4 // 100
+# define T_REG					1
+# define T_DIR					2
+# define T_IND					4
 
 # define PROG_NAME_LENGTH		(128)
 # define COMMENT_LENGTH			(2048)
@@ -63,7 +63,7 @@ typedef struct		s_op
 	int		cycles;
 	char	description[50];
 	int		acb;
-	int		label_size; // if == 1, then DIR is 2 bytes
+	int		label_size;
 }					t_op;
 
 #endif

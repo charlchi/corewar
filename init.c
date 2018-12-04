@@ -12,24 +12,8 @@
 
 #include "corewar.h"
 
-#define READ_ERR(fd, p, siz, str) if (read(fd, p, siz) < 1) \
-	{ft_putendl(str); exit(0);}
+#define READ_ERR(f, p, s, t) if (read(f, p, s) < 1) {ft_putendl(t); exit(0);}
 #define ERRP(x) {ft_putstr(x); exit(0);}
-
-int		main(int ac, char **av)
-{
-	t_vm		vm;
-
-	if (ac < 2)
-	{
-		//todo print usage
-		exit(0);
-	}
-	init_vm(&vm);
-	load_champs(&vm, ac, av);
-	load_vm(&vm);
-	run_vm(&vm);
-}
 
 void	init_vm(t_vm *vm)
 {
@@ -48,30 +32,6 @@ void	init_vm(t_vm *vm)
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
-}
-
-int		ft_contains(char *whole, char *part)
-{
-	int		i;
-	int		j;
-	int		valid;
-
-	i = -1;
-	j = 0;
-	valid = 0;
-	while (++i <= (int)ft_strlen(whole))
-	{
-		if (valid == (int)ft_strlen(part))
-			return (1);
-		if (whole[i] == part[j++])
-			valid++;
-		else
-		{
-			valid = 0;
-			j = 0;
-		}
-	}
-	return (0);
 }
 
 void	count_champ(t_vm *vm, char *file)
@@ -138,10 +98,7 @@ void	place_player(t_vm *vm, int pnum)
 		exit(1);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
 	if (*((unsigned int *)&ch->magic[0]) != 0xf383ea00)
-	{
-		ft_putendl("Not valid corewar champion!");
-		exit(0);
-	}
+		ERRP("Not valid corewar champion!\n");
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
 	READ_ERR(ch->fd, ch->prog_comment, COMMENT_LENGTH + 4, "Invalid Comment");

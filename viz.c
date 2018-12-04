@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   viz.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/17 11:42:54 by agabrie           #+#    #+#             */
-/*   Updated: 2018/09/21 09:17:48 by mgerber          ###   ########.fr       */
+/*   Created: 2018/12/04 14:06:07 by cmoller           #+#    #+#             */
+/*   Updated: 2018/12/04 14:06:11 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,5 +118,5 @@ void	print_vm(t_vm *vm)
 	print_arena(vm);
 	print_info(vm);
 	print_cursors(vm);
-	//usleep(200);
+	usleep(4000);
 }

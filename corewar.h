@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   corewar.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgerber <mgerber@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/11 11:28:36 by mgerber           #+#    #+#             */
-/*   Updated: 2018/09/21 09:22:19 by mgerber          ###   ########.fr       */
+/*   Created: 2018/12/04 15:02:44 by cmoller           #+#    #+#             */
+/*   Updated: 2018/12/04 15:02:46 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef COREWAR_H
 # define COREWAR_H
 
-# include <curses.h> 
+# include <curses.h>
 # include "libft/libft.h"
 # include "op.h"
 # include <stdlib.h>
@@ -38,16 +38,16 @@ typedef struct		s_process
 	int				n;
 }					t_process;
 
-typedef struct  	s_champ
+typedef struct		s_champ
 {
-    unsigned char	prog_name[PROG_NAME_LENGTH+4];
-	unsigned char	prog_comment[COMMENT_LENGTH+4];
+	unsigned char	prog_name[PROG_NAME_LENGTH + 4];
+	unsigned char	prog_comment[COMMENT_LENGTH + 4];
 	unsigned char	size[12];
 	unsigned char	*core;
 	unsigned char	magic[4];
 	char			*path;
 	int				ldnbr;
-    unsigned int	number;
+	unsigned int	number;
 	int				start_index;
 	int				lives;
 	int				last_live;
@@ -76,23 +76,21 @@ typedef struct		s_vm
 	int				n;
 }					t_vm;
 
-/*		viz.c */
+
+void				print_usage(void);
 void				init_viz(void);
 void				print_arena(t_vm *vm);
 void				print_cursors(t_vm *vm);
 void				print_info(t_vm *vm);
 void				print_vm(t_vm *vm);
-/*		corewar.c */
 void				run_vm(t_vm *vm);
 void				execute_process(t_vm *vm, t_process *cursor);
 void				dump_vm(t_vm *vm);
-/*		cursors.c */
 t_process			*create_cursor(int i);
 t_process			*clone_cursor(t_process *orig, int pc);
 void				add_cursor(t_vm *vm, t_process *new);
 void				clear_cursor_params(t_process *cursor);
 void				kill_cursors(t_vm *vm);
-/*		xfunctions.c */
 void				cw_live(t_vm *vm, t_process *cursor);
 void				cw_ld(t_vm *vm, t_process *cursor);
 void				cw_st(t_vm *vm, t_process *cursor);
@@ -109,14 +107,12 @@ void				cw_lld(t_vm *vm, t_process *cursor);
 void				cw_lldi(t_vm *vm, t_process *cursor);
 void				cw_lfork(t_vm *vm, t_process *cursor);
 void				cw_aff(t_vm *vm, t_process *cursor);
-/*		args.c */
 int					check_args_nocode(t_vm *vm, t_op *op, t_process *cursor);
 int					check_args(t_vm *vm, t_op *op, t_process *cursor);
 int					code_size(int code, int label_size);
 int					read_arg(t_vm *vm, int pos, int code, int label_size);
-/*		init */
 int					ft_contains(char *whole, char *part);
-void 				load_champs(t_vm *vm, int ac, char **av);
+void				load_champs(t_vm *vm, int ac, char **av);
 void				init_vm(t_vm *vm);
 void				ft_putarena(unsigned char *arena, int size);
 void				place_player(t_vm *vm, int pnum);
