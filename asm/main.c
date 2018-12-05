@@ -53,7 +53,7 @@ void	parse_name(t_parser *parser)
 		asm_parse_err(parser, ".name bad format\n");
 	while (++spaces <= PROG_NAME_LENGTH - 4)
 		add_byte(parser, 0);
-	free(l);
+	FREEIF(l);
 }
 
 void	parse_comment(t_parser *parser)
@@ -76,7 +76,7 @@ void	parse_comment(t_parser *parser)
 	}
 	while (++j <= COMMENT_LENGTH + 4)
 		add_byte(parser, 0);
-	free(l);
+	FREEIF(l);
 }
 
 void	open_champ_files(t_parser *parser, char *ifile)
@@ -90,7 +90,7 @@ void	open_champ_files(t_parser *parser, char *ifile)
 		asm_err("Unable to open input file\n");
 	if ((parser->ofd = open(ofile, O_RDWR | O_CREAT, 0666)) < 0)
 		asm_err("Unable to open output file\n");
-	free(ofile);
+	FREEIF(ofile);
 }
 
 void	parse_champion(char *ifile)
@@ -116,7 +116,7 @@ void	parse_champion(char *ifile)
 	i = 0;
 	while (i < parser->pos)
 		write(parser->ofd, &parser->program[i++], 1);
-	free(parser);
+	FREEIF(parser);
 	close(parser->ifd);
 	close(parser->ofd);
 }

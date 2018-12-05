@@ -93,12 +93,12 @@ void	print_info(t_vm *vm)
 	{
 		attron(COLOR_PAIR(1 + i));
 		attron(A_UNDERLINE);
-		mvprintw(i * 4 + 1, x, " Player %4d:               \n", i + 1);
+		mvprintw(i * 4 + 1, x, " Player %4d:               \n",
+			vm->champs[i].number);
 		attroff(A_UNDERLINE);
 		mvprintw(i * 4 + 2, x, "        Last live: %8d ",
 			vm->champs[i].last_live);
-		mvprintw(i * 4 + 3, x, " Lives this cycle: %8d ",
-			vm->champs[i].lives);
+		mvprintw(i * 4 + 3, x, " Lives this cycle: %8d ", vm->champs[i].lives);
 		attroff(COLOR_PAIR(1 + i));
 	}
 	attron(A_UNDERLINE);
@@ -118,5 +118,5 @@ void	print_vm(t_vm *vm)
 	print_arena(vm);
 	print_info(vm);
 	print_cursors(vm);
-	usleep(4000);
+	usleep(1000);
 }

@@ -76,7 +76,6 @@ typedef struct		s_vm
 	int				n;
 }					t_vm;
 
-
 void				print_usage(void);
 void				init_viz(void);
 void				print_arena(t_vm *vm);

@@ -20,7 +20,8 @@ t_labels	*new_label(char *str, int i)
 	label = (t_labels*)malloc(sizeof(t_labels));
 	label->name = ft_strdup(str);
 	ft_strchr(label->name, ':')[0] = '\0';
-	label->index = i - 8;
+	printf(" [%d] ", i);
+	label->index = i;
 	label->next = NULL;
 	return (label);
 }
@@ -54,6 +55,8 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 	instructions = ft_strsplit(asml, ' ');
 	if (((j = 0) + 1) && instructions && is_label(instructions[j]))
 		add_label(instructions[j++], i, list);
+	else
+		printf("        ");
 	if (instructions && instructions[1] && (k = -1))
 	{
 		while (++k < 17)
@@ -65,8 +68,12 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 			}
 		}
 		while (instructions[++j])
+		{
 			i += instruction_val(parser, instructions[j], k);
+			//printf("%15s %3d %4d    ", instructions[j], instruction_val(parser, instructions[j], k), i);
+		}
 	}
+	//printf("\n");
 	free_split(instructions);
 	return (i);
 }
@@ -93,8 +100,11 @@ int			first_pass(t_parser *parser, t_labels **list)
 	i = 0;
 	while ((asml = get_asm_line(parser)))
 	{
-		i = create_labels(parser, asml, i, list);
-		free(asml);
+		printf("%4d", i);
+		if (!(asml[0] == '.' || ft_strlen(asml) == 0))
+			i = create_labels(parser, asml, i, list);
+		printf(" %s\n", asml);
+		FREEIF(asml);
 	}
 	return (i);
 }

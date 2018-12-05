@@ -18,6 +18,8 @@
 # include "../libft/libft.h"
 # include "op.h"
 
+#define FREEIF(f) if (f) free(f)
+
 typedef struct		s_labels
 {
 	char			*name;
@@ -31,6 +33,7 @@ typedef struct		s_parser
 	t_op			op_tab[17];
 	int				pos;
 	int				pc;
+	int				start;
 	int				ifd;
 	int				ofd;
 	int				program[8000];

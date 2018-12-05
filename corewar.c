@@ -12,6 +12,15 @@
 
 #include "libft/libft.h"
 #include "corewar.h"
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define KYEL  "\x1B[33m"
+#define KBLU  "\x1B[34m"
+#define KMAG  "\x1B[35m"
+#define KCYN  "\x1B[36m"
+#define KWHT  "\x1B[37m"
+#define KRST "\033[0m"
 
 static		void(*g_cw_funcs[16])(t_vm *vm, t_process *cursor) = {
 	cw_live,
@@ -42,28 +51,22 @@ void		execute_process(t_vm *vm, t_process *c)
 	if (c->waitcycles == 0 && (op > 0 && op < 17))
 	{
 		clear_cursor_params(c);
-		DPRINT("CHECKING ARGS\n");
 		if (check_args(vm, &vm->op_tab[op], c))
 		{
-			DPRINT("P %4d | ", c->n);
-			DPRINT("%s ", vm->op_tab[op].name);
+			DPRINT("P %4d | %s ", c->n, vm->op_tab[op].name);
 			i = -1;
 			while (++i < vm->op_tab[op].nargs)
 				c->is_reg[i] ? DPRINT("r%d ", c->params[i] + 1)
 				: DPRINT("%d ", c->params[i]);
 			g_cw_funcs[op - 1](vm, c);
-			DPRINT("\n");
-			DPRINT("ADV %d ", c->pc - c->start);
+			DPRINT("\nADV %d ", c->pc - c->start);
 			DPRINT("(0x%04x -> 0x%04x) ", c->start, c->pc);
-
-			DPRINT(" (%d -> %d) ", c->start, c->pc);
 			i = MEM(c->start - 1);
 			while (++i < MEM(c->pc))
 				DPRINT("%02x ", vm->arena[MEM(i)]);
 			DPRINT("\n");
 			c->start = c->pc;
 		}
-		DPRINT("hi\n");
 	}
 }
 
@@ -84,7 +87,6 @@ void		execute_cursors(t_vm *vm)
 				c->waitcycles = vm->op_tab[op].cycles - 1;
 			else
 				c->pc++;
-			DPRINT("GG\n");
 			c->pc = c->pc % MEM_SIZE;
 		}
 		c = c->next;
@@ -114,13 +116,17 @@ void		print_winner(t_vm *vm)
 {
 	t_champ		ch;
 
-	DPRINT("%u\n", (unsigned int)vm->last_livep);
-	ch = vm->champs[vm->last_livep];
-	ft_putstr("Contestant ");
-	ft_putstr(ft_itoa(ch.number));
-	ft_putstr(", \"");
-	ft_putstr((char *)&ch.prog_name[0]);
-	ft_putstr("\", has won !\n");
+	if (vm->last_livep == -1)
+		ft_putstr(KRED "No champion called live!\nNobody wins...\n" KRST);
+	else
+	{
+		ch = vm->champs[vm->last_livep];
+		ft_putstr(KGRN "Contestant ");
+		ft_putstr(ft_itoa(ch.number));
+		ft_putstr(", \"");
+		ft_putstr((char *)&ch.prog_name[0]);
+		ft_putstr("\", has won !\n" KRST);
+	}
 }
 
 void		run_vm(t_vm *vm)

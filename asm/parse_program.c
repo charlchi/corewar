@@ -43,12 +43,14 @@ void	parse_direct(t_parser *p, char **tok, int j, int i)
 	int		s;
 	int		size;
 
-	s = p->pc - 1;
+	s = p->start - 1;
 	size = p->op_tab[i - 1].label_size;
 	if (tok[j][1] == LABEL_CHAR)
 	{
 		n = get_label_index(p->list, &tok[j][size == 0 ? 4 : 2]);
+		printf("got label index %5d   ", n);
 		n = n >= s ? n - s : 0xffff - (s - n) + 1;
+		printf("[%s:%d]\n", tok[j], n);
 		bytestr(p, n, size == 0 ? 4 : 2);
 	}
 	else
@@ -105,10 +107,10 @@ void	parse_program(t_parser *parser)
 			i = get_index(parser, tok[0]);
 			add_byte(parser, (char)parser->op_tab[i].id);
 			parser->pc++;
+			parser->start = parser->pc;
 			tok++;
 			parse_params(parser, tok, parser->op_tab[i].id);
 		}
 		free_split(freetok);
-		free(l);
 	}
 }

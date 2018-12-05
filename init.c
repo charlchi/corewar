@@ -13,7 +13,7 @@
 #include "corewar.h"
 
 #define READ_ERR(f, p, s, t) if (read(f, p, s) < 1) {ft_putendl(t); exit(0);}
-#define ERRP(x) {ft_putstr(x); exit(0);}
+#define ERRP(x) {ft_putstr(x); ft_putstr("\n"); exit(0);}
 
 void	init_vm(t_vm *vm)
 {
@@ -29,6 +29,7 @@ void	init_vm(t_vm *vm)
 	vm->cycle = vm->cycle_to_die;
 	vm->nolive = 0;
 	vm->n = -1;
+	vm->last_livep = -1;
 	ft_bzero(vm->arena, MEM_SIZE);
 	ft_bzero(vm->colors, MEM_SIZE);
 	set_op_tab(vm);
@@ -37,20 +38,23 @@ void	init_vm(t_vm *vm)
 void	count_champ(t_vm *vm, char *file)
 {
 	int		fd;
+	int		p;
 
 	if ((fd = open(file, O_RDONLY)) < 1)
 	{
 		ft_putstr("Error opening champion file : ");
-		ft_putstr(file);
-		ft_putstr("\n");
-		exit(1);
+		ERRP(file);
 	}
-	if (vm->n != -1 && vm->n < 4)
-		ERRP("Player numbers must be larger than 4\n");
-	if (vm->n > 4)
+	if (vm->n != -1)
 		vm->champs[vm->num_champs].number = vm->n;
 	else
 		vm->champs[vm->num_champs].number = vm->num_champs;
+	p = -1;
+	while (++p < vm->num_champs)
+	{
+		if (vm->champs[vm->num_champs].number == vm->champs[p].number)
+			ERRP("Duplicate champion numbers!");
+	}
 	vm->champs[vm->num_champs].path = ft_strdup(file);
 	vm->champs[vm->num_champs].last_live = 0;
 	vm->champs[vm->num_champs].lives = 0;
@@ -72,16 +76,16 @@ void	load_champs(t_vm *vm, int ac, char **av)
 		{
 			i++;
 			if (av[i] == NULL || (vm->n = ft_atoi(av[i])) == 0)
-				ERRP("Expected valid number after -n argument\n");
+				ERRP("Expected valid number after -n argument");
 		}
 		if (ft_strncmp(av[i], "-v", 2) == 0)
 			if ((vm->v = atoi(&av[i][2])) <= 0 || vm->v > 2)
-				ERRP("Invalid number after -v\n");
+				ERRP("Invalid number after -v");
 		if (ft_strncmp(av[i], "-dump", 5) == 0)
 		{
 			i++;
 			if (av[i] == NULL || (vm->dump = atoi(av[i])) == 0)
-				ERRP("Expected valid number after -dump argument\n");
+				ERRP("Expected valid number after -dump argument");
 		}
 	}
 }
@@ -98,7 +102,7 @@ void	place_player(t_vm *vm, int pnum)
 		exit(1);
 	READ_ERR(ch->fd, ch->magic, 4, "Exec Magic Incomplete");
 	if (*((unsigned int *)&ch->magic[0]) != 0xf383ea00)
-		ERRP("Not valid corewar champion!\n");
+		ERRP("Not valid corewar champion!");
 	READ_ERR(ch->fd, ch->prog_name, PROG_NAME_LENGTH - 4, "Program name err");
 	READ_ERR(ch->fd, ch->size, 12, "Invalid program size");
 	READ_ERR(ch->fd, ch->prog_comment, COMMENT_LENGTH + 4, "Invalid Comment");
@@ -127,15 +131,14 @@ void	load_vm(t_vm *vm)
 		vm->champs[p].start = p * (MEM_SIZE / vm->num_champs);
 		cur = create_cursor(vm->champs[p].start);
 		cur->waitcycles = 0;
-		cur->reg[0] = p;
-		vm->champs[p].number = p;
 		i = 1;
 		while (i < 16)
 			cur->reg[i++] = 0;
 		add_cursor(vm, cur);
 		place_player(vm, p);
+		cur->reg[0] = vm->champs[p].number;
 		ft_putstr("* Player ");
-		ft_putnbr(p);
+		ft_putnbr(vm->champs[p].number);
 		ft_putstr(", ");
 		ft_putstr((char *)vm->champs[p].prog_name);
 		ft_putstr("\n");

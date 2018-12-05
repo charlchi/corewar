@@ -12,7 +12,7 @@
 
 #include "corewar.h"
 
-int		main(int ac, char **av)
+int			main(int ac, char **av)
 {
 	t_vm		vm;
 

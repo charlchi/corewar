@@ -35,8 +35,8 @@ void		free_split(char **array)
 
 	i = 0;
 	while (array && array[i])
-		free(array[i++]);
-	free(array);
+		FREEIF(array[i++]);
+	FREEIF(array);
 }
 
 char		*strip_asm(char *str)
@@ -61,7 +61,6 @@ char		*strip_asm(char *str)
 	while (str[j] == ' ')
 		j--;
 	str[j + 1] = '\0';
-	printf("stripped line [%s]\n", str + i);
 	return (ft_strdup(str + i));
 }
 
