@@ -35,8 +35,8 @@ void		free_split(char **array)
 
 	i = 0;
 	while (array && array[i])
-		FREEIF(array[i++]);
-	FREEIF(array);
+		free(array[i++]);
+	free(array);
 }
 
 char		*strip_asm(char *str)

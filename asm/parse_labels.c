@@ -89,7 +89,10 @@ int			get_label_index(t_labels *list, char *label)
 			return (curr->index);
 		curr = curr->next;
 	}
-	return (-1);
+	ft_putstr("Label does not exist: ");
+	ft_putstr(label);
+	ft_putstr("\n");
+	exit(0);
 }
 
 int			first_pass(t_parser *parser, t_labels **list)

@@ -116,6 +116,7 @@ void	place_player(t_vm *vm, int pnum)
 	}
 	ch->p_size = i;
 	ft_memcpy(&vm->arena[ch->start], ch->core, ch->p_size);
+	free(ch->core);
 }
 
 void	load_vm(t_vm *vm)
