@@ -48,9 +48,7 @@ void	parse_direct(t_parser *p, char **tok, int j, int i)
 	if (tok[j][1] == LABEL_CHAR)
 	{
 		n = get_label_index(p->list, &tok[j][size == 0 ? 4 : 2]);
-		printf("got label index %5d   ", n);
 		n = n >= s ? n - s : 0xffff - (s - n) + 1;
-		printf("[%s:%d]\n", tok[j], n);
 		bytestr(p, n, size == 0 ? 4 : 2);
 	}
 	else

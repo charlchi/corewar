@@ -20,7 +20,6 @@ t_labels	*new_label(char *str, int i)
 	label = (t_labels*)malloc(sizeof(t_labels));
 	label->name = ft_strdup(str);
 	ft_strchr(label->name, ':')[0] = '\0';
-	printf(" [%d] ", i);
 	label->index = i;
 	label->next = NULL;
 	return (label);
@@ -32,9 +31,9 @@ void		add_label(char *str, int i, t_labels **list)
 	t_labels	*head;
 
 	label = new_label(str, i);
-	head = *list;
-	if (head)
+	if (*list)
 	{
+		head = *list;
 		while (head->next)
 			head = head->next;
 		head->next = label;

@@ -42,6 +42,7 @@ typedef struct		s_parser
 	int				size;
 }					t_parser;
 
+void				free_labels(t_labels **list);
 void				bytestr(t_parser *parser, int val, int n);
 void				set_op_tab(t_parser *parser);
 int					is_label(char *str);

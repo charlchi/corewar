@@ -57,3 +57,18 @@ void		add_byte(t_parser *parser, int c)
 	parser->program[parser->pos] = (int)c;
 	parser->pos++;
 }
+
+void		free_labels(t_labels **list)
+{
+	t_labels		*curr;
+	t_labels		*next;
+
+	curr = *list;
+	while (curr)
+	{
+		next = curr->next;
+		free(curr->name);
+		free(curr);
+		curr = next;
+	}
+}

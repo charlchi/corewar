@@ -96,27 +96,26 @@ void	open_champ_files(t_parser *parser, char *ifile)
 void	parse_champion(char *ifile)
 {
 	int			i;
-	t_parser	*parser;
+	t_parser	parser;
 
-	parser = (t_parser *)malloc(sizeof(t_parser));
-	set_op_tab(parser);
-	parser->list = NULL;
-	open_champ_files(parser, ifile);
-	parser->size = first_pass(parser, &parser->list);
-	lseek(parser->ifd, 0, SEEK_SET);
-	parser->line = 0;
-	parser->pos = 0;
-	parser->pc = 0;
-	add_bytes(parser, "\x00\xea\x83\xf3", 4);
-	parse_name(parser);
-	add_bytes(parser, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 10);
-	bytestr(parser, parser->size, 2);
-	parse_comment(parser);
-	parse_program(parser);
+	set_op_tab(&parser);
+	parser.list = NULL;
+	open_champ_files(&parser, ifile);
+	parser.size = first_pass(&parser, &parser.list);
+	lseek(parser.ifd, 0, SEEK_SET);
+	parser.line = 0;
+	parser.pos = 0;
+	parser.pc = 0;
+	add_bytes(&parser, "\x00\xea\x83\xf3", 4);
+	parse_name(&parser);
+	add_bytes(&parser, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 10);
+	bytestr(&parser, parser.size, 2);
+	parse_comment(&parser);
+	parse_program(&parser);
 	i = 0;
-	while (i < parser->pos)
-		write(parser->ofd, &parser->program[i++], 1);
-	FREEIF(parser);
-	close(parser->ifd);
-	close(parser->ofd);
+	while (i < parser.pos)
+		write(parser.ofd, &parser.program[i++], 1);
+	close(parser.ifd);
+	close(parser.ofd);
+	free_labels(&parser.list);
 }
