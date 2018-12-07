@@ -54,6 +54,7 @@ char		*get_asm_line(t_parser *parser)
 	if ((r = get_line(parser->ifd, &l) > 0))
 	{
 		asml = strip_asm(l);
+		FREEIF(l);
 	}
 	while (r > 0 && ft_strlen(asml) == 0)
 	{
@@ -62,6 +63,7 @@ char		*get_asm_line(t_parser *parser)
 		parser->col = 0;
 		r = get_line(parser->ifd, &l);
 		asml = strip_asm(l);
+		FREEIF(l);
 	}
 	return (asml);
 }

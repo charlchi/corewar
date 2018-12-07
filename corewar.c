@@ -115,17 +115,21 @@ void		check_cursors(t_vm *vm)
 void		print_winner(t_vm *vm)
 {
 	t_champ		ch;
+	char		*val;
 
 	if (vm->last_livep == -1)
 		ft_putstr(KRED "No champion called live!\nNobody wins...\n" KRST);
 	else
 	{
 		ch = vm->champs[vm->last_livep];
+		val = ft_itoa(ch.number);
 		ft_putstr(KGRN "Contestant ");
-		ft_putstr(ft_itoa(ch.number));
+		ft_putstr(val);
 		ft_putstr(", \"");
 		ft_putstr((char *)&ch.prog_name[0]);
 		ft_putstr("\", has won !\n" KRST);
+		if (val)
+			free(val);
 	}
 }
 
