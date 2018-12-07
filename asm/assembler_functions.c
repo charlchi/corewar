@@ -39,31 +39,6 @@ void		free_split(char **array)
 	free(array);
 }
 
-char		*strip_asm(char *str)
-{
-	int				i;
-	int				j;
-	char			*new;
-
-	if (str == NULL)
-		return (NULL);
-	i = 0;
-	j = 0;
-	if ((new = ft_strchr(str, COMMENT_CHAR)))
-		*new = '\0';
-	while ((new = ft_strchr(str, '\t')))
-		*new = ' ';
-	while (str[i] == ' ' && str[i] != '\0')
-		i++;
-	while (str[j] != '\0')
-		j++;
-	j--;
-	while (str[j] == ' ')
-		j--;
-	str[j + 1] = '\0';
-	return (ft_strdup(str + i));
-}
-
 void		add_bytes(t_parser *parser, char *s, int n)
 {
 	int				i;
