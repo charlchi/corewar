@@ -31,10 +31,3 @@ int			instruction_val(t_parser *parser, char *str, int k)
 		return (parser->op_tab[k].label_size ? DIR_SIZE / 2 : DIR_SIZE);
 	return (IND_SIZE);
 }
-	//if (code == T_REG)
-	//	return (1);
-	//else if (code == T_DIR && label_size == 0)
-	//	return (4);
-	//else if (code == T_IND || (code == T_DIR && label_size))
-	//	return (2);
-	//return (0);

@@ -102,9 +102,8 @@ void	parse_program(t_parser *parser)
 		freetok = tok;
 		if (ft_strchr(tok[0], ':'))
 			tok++;
-		if (tok[0])
+		if (tok[0] && (i = get_index(parser, tok[0])) + 1)
 		{
-			i = get_index(parser, tok[0]);
 			add_byte(parser, (char)parser->op_tab[i].id);
 			parser->pc++;
 			parser->start = parser->pc;

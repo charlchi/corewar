@@ -6,7 +6,7 @@
 #    By: cmoller <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/18 13:23:13 by cmoller           #+#    #+#              #
-#    Updated: 2018/09/25 12:57:47 by cmoller          ###   ########.fr        #
+#    Updated: 2018/12/07 15:44:55 by cmoller          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,9 +27,11 @@ $(NAME):	$(OBJ)
 
 clean:
 			/bin/rm -f $(NAME)
+			/bin/rm -f asm/asm
 
 fclean: 	clean
 			/bin/rm -f *.o
+			/bin/rm -f **/*.o
 			/bin/rm -f libft/*.o
 
 re: 		fclean all
