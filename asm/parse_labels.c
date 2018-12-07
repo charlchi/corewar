@@ -9,7 +9,7 @@
 /*   Updated: 2018/11/24 16:27:05 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
- 
+
 #include "assembler.h"
 #include <stdio.h>
 
@@ -20,6 +20,7 @@ t_labels	*new_label(char *str, int i)
 	label = (t_labels*)malloc(sizeof(t_labels));
 	label->name = ft_strdup(str);
 	ft_strchr(label->name, ':')[0] = '\0';
+	printf(" [%d] ", i);
 	label->index = i;
 	label->next = NULL;
 	return (label);
@@ -39,7 +40,7 @@ void		add_label(char *str, int i, t_labels **list)
 		head->next = label;
 	}
 	else
-		head = label;
+		*list = label;
 }
 
 int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
@@ -82,10 +83,7 @@ int			get_label_index(t_labels *list, char *label)
 			return (curr->index);
 		curr = curr->next;
 	}
-	ft_putstr("Label does not exist: ");
-	ft_putstr(label);
-	ft_putstr("\n");
-	exit(0);
+	return (-1);
 }
 
 int			first_pass(t_parser *parser, t_labels **list)

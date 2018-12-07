@@ -102,15 +102,15 @@ void	parse_program(t_parser *parser)
 		freetok = tok;
 		if (ft_strchr(tok[0], ':'))
 			tok++;
-		if (tok[0] && (i = get_index(parser, tok[0])) + 1)
+		if (tok[0])
 		{
+			i = get_index(parser, tok[0]);
 			add_byte(parser, (char)parser->op_tab[i].id);
 			parser->pc++;
 			parser->start = parser->pc;
 			tok++;
 			parse_params(parser, tok, parser->op_tab[i].id);
 		}
-		free(l);
 		free_split(freetok);
 	}
 }
