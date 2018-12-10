@@ -24,7 +24,7 @@ int		main(int argc, char **argv)
 		if ((i = ft_strlen(argv[a])) < 3)
 			asm_err("Invalid file name");
 		if (argv[a][i - 1] != 's' || argv[a][i - 2] != '.')
-			asm_err("Invalid file extension, must end with \".s\"");
+			asm_err("Invalid file extension, must end with \".s\"\n");
 		parse_champion(argv[a]);
 		a++;
 	}
