@@ -18,7 +18,7 @@
 # include "../libft/libft.h"
 # include "op.h"
 
-#define FREEIF(f) if (f) free(f)
+# define FREEIF(f) if (f) free(f)
 
 typedef struct		s_labels
 {
@@ -40,6 +40,7 @@ typedef struct		s_parser
 	int				line;
 	int				col;
 	int				size;
+	char			*file;
 }					t_parser;
 
 void				free_labels(t_labels **list);

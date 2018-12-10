@@ -21,7 +21,8 @@ void	asm_err(char *s)
 
 void	asm_parse_err(t_parser *parser, char *s)
 {
-	ft_putstr("Error line ");
+	ft_putstr(parser->file);
+	ft_putstr(":\n Error line ");
 	ft_putnbr(parser->line);
 	ft_putstr(": ");
 	ft_putstr(s);

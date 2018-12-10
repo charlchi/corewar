@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME =	asm
-FLAGS =	-Wall -Wextra -Werror
+FLAGS =	-Wall -Wextra -Werror -O0
 CC = gcc
 SRC = $(wildcard *.c) $(wildcard ../libft/*.c)
 OBJ = $(SRC:.c=.o)

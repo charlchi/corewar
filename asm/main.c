@@ -26,6 +26,9 @@ int		main(int argc, char **argv)
 		if (argv[a][i - 1] != 's' || argv[a][i - 2] != '.')
 			asm_err("Invalid file extension, must end with \".s\"\n");
 		parse_champion(argv[a]);
+		ft_putstr("Succesfully parsed champion ");
+		ft_putstr(argv[a]);
+		ft_putstr("\n");
 		a++;
 	}
 	return (0);
@@ -37,23 +40,28 @@ void	parse_name(t_parser *parser)
 	int		i;
 	int		spaces;
 
+	parser->line = 0;
 	l = get_asm_line(parser);
 	if (l == NULL)
 		asm_parse_err(parser, ".name bad format\n");
-	if (ft_strncmp(".name \"", l, 7) != 0)
+	if (ft_strncmp(".name", l, 5) != 0)
 		asm_parse_err(parser, ".name bad format\n");
-	i = 7;
+	i = 5;
+	while (l[i] == ' ')
+		i++;
+	if (l[i] != '"')
+		asm_parse_err(parser, "Invalid name\n");
 	spaces = 0;
-	while (l[i] != '"' && l[i])
+	while (l[++i] != '"')
 	{
-		add_byte(parser, l[i++]);
+		add_byte(parser, l[i]);
 		spaces++;
 	}
 	if (spaces == 0 || l[i] != '"')
 		asm_parse_err(parser, ".name bad format\n");
 	while (++spaces <= PROG_NAME_LENGTH - 4)
 		add_byte(parser, 0);
-	FREEIF(l);
+	//FREEIF(l);
 }
 
 void	parse_comment(t_parser *parser)
@@ -68,21 +76,29 @@ void	parse_comment(t_parser *parser)
 	i = 8;
 	while (l[i] == ' ')
 		i++;
+	if (l[i] != '\"')
+		asm_parse_err(parser, "Invalid comment\n");
 	j = 0;
-	while (l[++i] != '"')
+	while (l[++i] != '"' && l[i])
 	{
 		add_byte(parser, l[i]);
 		j++;
 	}
+	if (l[i] != '\"')
+		asm_parse_err(parser, "Invalid comment\n");
 	while (++j <= COMMENT_LENGTH + 4)
 		add_byte(parser, 0);
-	FREEIF(l);
+	//FREEIF(l);
 }
 
 void	open_champ_files(t_parser *parser, char *ifile)
 {
 	char		*ofile;
 
+	parser->line = 0;
+	parser->pos = 0;
+	parser->pc = 0;
+	parser->file = ifile;
 	ofile = (char *)malloc(ft_strlen(ifile) + 2);
 	ft_strcpy(ofile, ifile);
 	ft_strcpy(&ofile[ft_strlen(ifile) - 1], "cor");
@@ -103,9 +119,6 @@ void	parse_champion(char *ifile)
 	open_champ_files(&parser, ifile);
 	parser.size = first_pass(&parser, &parser.list);
 	lseek(parser.ifd, 0, SEEK_SET);
-	parser.line = 0;
-	parser.pos = 0;
-	parser.pc = 0;
 	add_bytes(&parser, "\x00\xea\x83\xf3", 4);
 	parse_name(&parser);
 	add_bytes(&parser, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 10);

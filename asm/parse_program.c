@@ -33,6 +33,8 @@ void	parse_acb(t_parser *parser, char **tokens, int i)
 		j++;
 		k--;
 	}
+	if (tokens[j] != NULL)
+		asm_parse_err(parser, "Invalid number of arguments!\n");
 	add_byte(parser, (char)opcode);
 	parser->pc++;
 }
@@ -51,24 +53,32 @@ void	parse_direct(t_parser *p, char **tok, int j, int i)
 		n = n >= s ? n - s : 0xffff - (s - n) + 1;
 		bytestr(p, n, size == 0 ? 4 : 2);
 	}
-	else
+	else if (ft_isdigit(tok[j][1]))
 		bytestr(p, ft_atoi(&tok[j][1]), size == 0 ? 4 : 2);
 }
 
 void	parse_params(t_parser *p, char **tok, int i)
 {
 	int		j;
+	int		val;
 
 	(p->op_tab[i - 1].acb ? parse_acb(p, tok, i) : 0);
 	j = -1;
 	while (++j < p->op_tab[i - 1].nargs)
 	{
 		if (tok[j][0] == 'r')
-			add_byte(p, ft_atoi(&tok[j][1]));
+		{
+			val = ft_atoi(&tok[j][1]);
+			if (val <= 0 || val > 16)
+				asm_parse_err(p, "Invalid register size\n");
+			add_byte(p, val);
+		}
 		else if (tok[j][0] == DIRECT_CHAR)
 			parse_direct(p, tok, j, i);
 		else if (ft_isdigit(tok[j][0]) || tok[j][0] == '-')
 			bytestr(p, ft_atoi(&tok[j][0]), 2);
+		else
+			asm_parse_err(p, "Invalid parameters\n");
 		p->pc += instruction_val(p, tok[j], i - 1);
 	}
 }
@@ -98,8 +108,7 @@ void	parse_program(t_parser *parser)
 			*r = ' ';
 		tok = ft_strsplit(l, ' ');
 		freetok = tok;
-		if (ft_strchr(tok[0], ':'))
-			tok++;
+		tok += ft_strchr(tok[0], ':') ? 1 : 0;
 		if (tok[0])
 		{
 			i = get_index(parser, tok[0]);
@@ -109,7 +118,7 @@ void	parse_program(t_parser *parser)
 			tok++;
 			parse_params(parser, tok, parser->op_tab[i].id);
 		}
-		FREEIF(l); // CAREFULL
+		//FREEIF(l);
 		free_split(freetok);
 	}
 }

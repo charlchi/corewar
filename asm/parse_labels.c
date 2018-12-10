@@ -44,13 +44,11 @@ void		add_label(char *str, int i, t_labels **list)
 
 int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 {
-	char	*r;
 	char	**instructions;
 	int		j;
 	int		k;
 
-	while ((r = ft_strchr(asml, SEPARATOR_CHAR)))
-		*r = ' ';
+
 	instructions = ft_strsplit(asml, ' ');
 	if (((j = 0) + 1) && instructions && is_label(instructions[j]))
 		add_label(instructions[j++], i, list);
@@ -64,6 +62,8 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 				break ;
 			}
 		}
+		if (k >= 17)
+			asm_parse_err(parser, "Invalid instruction\n");
 		while (instructions[++j])
 			i += instruction_val(parser, instructions[j], k);
 	}
@@ -82,20 +82,31 @@ int			get_label_index(t_labels *list, char *label)
 			return (curr->index);
 		curr = curr->next;
 	}
-	return (-1);
+	ft_putstr("Found invalid label! ");
+	ft_putstr(label);
+	ft_putstr("\n");
+	exit(0);
 }
 
 int			first_pass(t_parser *parser, t_labels **list)
 {
+	char	*r;
 	int		i;
 	char	*asml;
 
+	parser->line = 0;
+	parser->pos = 0;
+	parser->pc = 0;
 	i = 0;
 	while ((asml = get_asm_line(parser)))
 	{
 		if (!(asml[0] == '.' || ft_strlen(asml) == 0))
+		{
+			while ((r = ft_strchr(asml, SEPARATOR_CHAR)))
+				*r = ' ';
 			i = create_labels(parser, asml, i, list);
-		FREEIF(asml);
+		}
+		//FREEIF(asml);
 	}
 	return (i);
 }
