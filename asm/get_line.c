@@ -57,9 +57,12 @@ char		*get_asm_line(t_parser *parser)
 	{
 		parser->line++;
 		parser->col = 0;
+		FREEIF(l);
+		FREEIF(asml);
 		r = get_line(parser->ifd, &l);
 		asml = strip_asm(l);
 	}
+	FREEIF(l);
 	return (asml);
 }
 

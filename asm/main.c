@@ -49,9 +49,8 @@ void	parse_name(t_parser *parser)
 	i = 5;
 	while (l[i] == ' ')
 		i++;
-	if (l[i] != '"')
+	if (!(spaces = 0) && l[i] != '"')
 		asm_parse_err(parser, "Invalid name\n");
-	spaces = 0;
 	while (l[++i] != '"')
 	{
 		add_byte(parser, l[i]);
@@ -61,6 +60,7 @@ void	parse_name(t_parser *parser)
 		asm_parse_err(parser, ".name bad format\n");
 	while (++spaces <= PROG_NAME_LENGTH - 4)
 		add_byte(parser, 0);
+	FREEIF(l);
 }
 
 void	parse_comment(t_parser *parser)
@@ -85,6 +85,7 @@ void	parse_comment(t_parser *parser)
 	}
 	if (l[i] != '\"')
 		asm_parse_err(parser, "Invalid comment\n");
+	FREEIF(l);
 	while (++j <= COMMENT_LENGTH + 4)
 		add_byte(parser, 0);
 }

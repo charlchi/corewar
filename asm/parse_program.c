@@ -119,5 +119,6 @@ void	parse_program(t_parser *parser)
 			parse_params(parser, tok, parser->op_tab[i].id);
 		}
 		free_split(freetok);
+		FREEIF(l);
 	}
 }
