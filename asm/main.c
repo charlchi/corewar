@@ -6,7 +6,7 @@
 /*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/24 16:25:31 by cmoller           #+#    #+#             */
-/*   Updated: 2018/11/24 16:25:41 by cmoller          ###   ########.fr       */
+/*   Updated: 2019/01/07 09:22:53 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void	parse_name(t_parser *parser)
 		asm_parse_err(parser, ".name bad format\n");
 	while (++spaces <= PROG_NAME_LENGTH - 4)
 		add_byte(parser, 0);
-	//FREEIF(l);
 }
 
 void	parse_comment(t_parser *parser)
@@ -88,7 +87,6 @@ void	parse_comment(t_parser *parser)
 		asm_parse_err(parser, "Invalid comment\n");
 	while (++j <= COMMENT_LENGTH + 4)
 		add_byte(parser, 0);
-	//FREEIF(l);
 }
 
 void	open_champ_files(t_parser *parser, char *ifile)

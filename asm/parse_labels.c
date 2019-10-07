@@ -48,7 +48,6 @@ int			create_labels(t_parser *parser, char *asml, int i, t_labels **list)
 	int		j;
 	int		k;
 
-
 	instructions = ft_strsplit(asml, ' ');
 	if (((j = 0) + 1) && instructions && is_label(instructions[j]))
 		add_label(instructions[j++], i, list);
