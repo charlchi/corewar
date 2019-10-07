@@ -159,5 +159,15 @@ void		run_vm(t_vm *vm)
 		dump_vm(vm);
 	else
 		print_winner(vm);
+	// TODO just put this in a function somewhere so it norms
+	t_process	*cc;
+	t_process	*prev;
+	cc = vm->first;
+	while (cc)
+	{
+		prev = cc;
+		cc = cc->next;
+		free(prev);
+	}
 	exit(0);
 }
