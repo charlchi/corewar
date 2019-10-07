@@ -106,7 +106,7 @@ int			first_pass(t_parser *parser, t_labels **list)
 				*r = ' ';
 			i = create_labels(parser, asml, i, list);
 		}
-		//FREEIF(asml);
+		FREEIF(asml);
 	}
 	return (i);
 }

@@ -55,7 +55,7 @@ void	count_champ(t_vm *vm, char *file)
 		if (vm->champs[vm->num_champs].number == vm->champs[p].number)
 			ERRP("Duplicate champion numbers!");
 	}
-	vm->champs[vm->num_champs].path = ft_strdup(file);
+	vm->champs[vm->num_champs].path = file;
 	vm->champs[vm->num_champs].last_live = 0;
 	vm->champs[vm->num_champs].lives = 0;
 	vm->num_champs++;
