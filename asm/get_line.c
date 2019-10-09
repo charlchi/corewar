@@ -76,7 +76,9 @@ char		*strip_asm(char *str)
 		return (NULL);
 	i = 0;
 	j = 0;
-	if ((new = ft_strchr(str, COMMENT_CHAR)))
+	while ((new = ft_strchr(str, COMMENT_CHAR)))
+		*new = '\0';
+	while ((new = ft_strchr(str, ';')))
 		*new = '\0';
 	while ((new = ft_strchr(str, '\t')))
 		*new = ' ';

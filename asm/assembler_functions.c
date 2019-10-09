@@ -46,7 +46,7 @@ void		add_bytes(t_parser *parser, char *s, int n)
 	i = 0;
 	while (i < n)
 	{
-		parser->program[parser->pos] = (int)(*s++);
+		parser->program[parser->pos] = (unsigned char)(*s++);
 		parser->pos++;
 		i++;
 	}
@@ -54,7 +54,7 @@ void		add_bytes(t_parser *parser, char *s, int n)
 
 void		add_byte(t_parser *parser, int c)
 {
-	parser->program[parser->pos] = (int)c;
+	parser->program[parser->pos] = (unsigned char)c;
 	parser->pos++;
 }
 

@@ -6,7 +6,7 @@
 /*   By: cmoller <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/24 16:25:31 by cmoller           #+#    #+#             */
-/*   Updated: 2019/01/07 09:22:53 by cmoller          ###   ########.fr       */
+/*   Updated: 2019/10/09 10:17:56 by cmoller          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,14 @@ int		main(int argc, char **argv)
 			asm_err("Invalid file name");
 		if (argv[a][i - 1] != 's' || argv[a][i - 2] != '.')
 			asm_err("Invalid file extension, must end with \".s\"\n");
+		//ft_putstr("Parsing ");
+		//ft_putstr(argv[a]);
+		//ft_putstr(" ...... ");
 		parse_champion(argv[a]);
-		ft_putstr("Succesfully parsed champion ");
-		ft_putstr(argv[a]);
-		ft_putstr("\n");
+		//ft_putstr("Success!\n");
 		a++;
 	}
+	while(1){}
 	return (0);
 }
 
@@ -126,7 +128,7 @@ void	parse_champion(char *ifile)
 	parse_program(&parser);
 	i = 0;
 	while (i < parser.pos)
-		write(parser.ofd, &parser.program[i++], 1);
+		write(parser.ofd, (unsigned char *)(&parser.program[i++]), 1);
 	close(parser.ifd);
 	close(parser.ofd);
 	free_labels(&parser.list);

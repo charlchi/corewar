@@ -53,7 +53,7 @@ void	parse_direct(t_parser *p, char **tok, int j, int i)
 		n = n >= s ? n - s : 0xffff - (s - n) + 1;
 		bytestr(p, n, size == 0 ? 4 : 2);
 	}
-	else if (ft_isdigit(tok[j][1]))
+	else if (ft_isdigit(tok[j][1]) || tok[j][1] == '-')
 		bytestr(p, ft_atoi(&tok[j][1]), size == 0 ? 4 : 2);
 }
 
