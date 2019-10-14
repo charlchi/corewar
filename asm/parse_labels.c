@@ -107,6 +107,5 @@ int			first_pass(t_parser *parser, t_labels **list)
 		}
 		FREEIF(asml);
 	}
-	FREEIF(asml);
 	return (i);
 }

@@ -32,7 +32,6 @@ int		main(int argc, char **argv)
 		//ft_putstr("Success!\n");
 		a++;
 	}
-	while(1){}
 	return (0);
 }
 
@@ -100,7 +99,7 @@ void	open_champ_files(t_parser *parser, char *ifile)
 	parser->pos = 0;
 	parser->pc = 0;
 	parser->file = ifile;
-	ofile = (char *)malloc(ft_strlen(ifile) + 2);
+	ofile = (char *)malloc(ft_strlen(ifile) + 5);
 	ft_strcpy(ofile, ifile);
 	ft_strcpy(&ofile[ft_strlen(ifile) - 1], "cor");
 	if ((parser->ifd = open(ifile, O_RDONLY)) < 0)

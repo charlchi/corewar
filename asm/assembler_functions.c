@@ -35,8 +35,8 @@ void		free_split(char **array)
 
 	i = 0;
 	while (array && array[i])
-		free(array[i++]);
-	free(array);
+		FREENO(array[i++]);
+	FREENO(array);
 }
 
 void		add_bytes(t_parser *parser, char *s, int n)
@@ -67,8 +67,8 @@ void		free_labels(t_labels **list)
 	while (curr)
 	{
 		next = curr->next;
-		free(curr->name);
-		free(curr);
+		FREENO(curr->name);
+		FREENO(curr);
 		curr = next;
 	}
 }

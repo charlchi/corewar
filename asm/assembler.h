@@ -18,7 +18,8 @@
 # include "../libft/libft.h"
 # include "op.h"
 
-# define FREEIF(f) if (f) free(f)
+# define FREEIF(f) if (f);// free(f)
+# define FREENO(f) if (f);
 
 typedef struct		s_labels
 {
