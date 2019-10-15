@@ -72,7 +72,7 @@ void	parse_comment(t_parser *parser)
 
 	l = get_asm_line(parser);
 	if (ft_strncmp(".comment", l, 8) != 0)
-		asm_parse_err(parser, "Champion .comment not found");
+		asm_parse_err(parser, "Champion .comment not found\n");
 	i = 8;
 	while (l[i] == ' ')
 		i++;
