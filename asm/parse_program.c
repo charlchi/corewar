@@ -109,7 +109,7 @@ void	parse_program(t_parser *parser)
 		tok = ft_strsplit(l, ' ');
 		freetok = tok;
 		tok += ft_strchr(tok[0], ':') ? 1 : 0;
-		if (tok[0])
+		if (tok && tok[0])
 		{
 			i = get_index(parser, tok[0]);
 			add_byte(parser, (char)parser->op_tab[i].id);
