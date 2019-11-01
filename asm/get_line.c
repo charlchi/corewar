@@ -44,7 +44,7 @@ int			get_line(int fd, char **l)
 
 char		*get_asm_line(t_parser *parser)
 {
-	char			*l;
+ 	char			*l;
 	char			*asml;
 	int				r;
 
@@ -53,7 +53,7 @@ char		*get_asm_line(t_parser *parser)
 	asml = NULL;
 	if ((r = get_line(parser->ifd, &l) > 0))
 		asml = strip_asm(l);
-	while (r > 0 && ft_strlen(asml) == 0)
+	while (r > 0 && (asml == NULL || ft_strlen(asml) == 0))
 	{
 		parser->line++;
 		parser->col = 0;
@@ -68,27 +68,20 @@ char		*get_asm_line(t_parser *parser)
 
 char		*strip_asm(char *str)
 {
-	int				i;
-	int				j;
 	char			*new;
 
-	if (str == NULL)
+	if (str == NULL || ft_strlen(str) == 0)
 		return (NULL);
-	i = 0;
-	j = 0;
+	// Look for comment char replace with null
+	// This potentially cuts off string and puts length at 0
 	while ((new = ft_strchr(str, COMMENT_CHAR)))
 		*new = '\0';
+	// Look for comment char replace with null
+	// This potentially cuts off string and puts length at 0
 	while ((new = ft_strchr(str, ';')))
 		*new = '\0';
+	// Replace tabs with spaces
 	while ((new = ft_strchr(str, '\t')))
 		*new = ' ';
-	while (str[i] == ' ' && str[i] != '\0')
-		i++;
-	while (str[j] != '\0')
-		j++;
-	j--;
-	while (str[j] == ' ')
-		j--;
-	str[j + 1] = '\0';
-	return (ft_strdup(str + i));
+	return ft_strtrim(str);
 }

@@ -17,13 +17,19 @@ char	*ft_strwordchr(char const *s, char c)
 	char	*ret;
 	int		len;
 
+	if (!s)
+		return (NULL);
 	len = 0;
 	while (s[len] && s[len] != c)
 		len++;
-	if (!(ret = (char *)malloc(len)))
+	if (len == 0)
+		return (NULL);
+	if (!(ret = (char *)malloc(len + 1)))
 		return (NULL);
 	ret[len] = '\0';
 	while (len--)
+	{
 		ret[len] = s[len];
+	}
 	return (ret);
 }

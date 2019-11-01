@@ -12,24 +12,32 @@
 
 #include "assembler.h"
 #include <stdio.h>
+#include <sys/wait.h>
 
 int		main(int argc, char **argv)
 {
 	int		a;
 	int		i;
+	//int		status;
+	//pid_t	wpid;
 
 	a = 1;
 	while (a < argc)
 	{
-		if ((i = ft_strlen(argv[a])) < 3)
-			asm_err("Invalid file name");
-		if (argv[a][i - 1] != 's' || argv[a][i - 2] != '.')
-			asm_err("Invalid file extension, must end with \".s\"\n");
-		//ft_putstr("Parsing ");
-		//ft_putstr(argv[a]);
-		//ft_putstr(" ...... ");
-		parse_champion(argv[a]);
-		//ft_putstr("Success!\n");
+		//if (fork() == 0)
+		//{
+			if ((i = ft_strlen(argv[a])) < 3)
+				asm_err("Invalid file name");
+			if (argv[a][i - 1] != 's' || argv[a][i - 2] != '.')
+				asm_err("Invalid file extension, must end with \".s\"\n");
+			ft_putstr("Parsing ");
+			ft_putstr(" ... ");
+			parse_champion(argv[a]);
+			ft_putstr("Successfully parsed ");
+			ft_putstr(argv[a]);
+			ft_putstr("\n");
+		//}
+		//while ((wpid = wait(&status)) > 0);
 		a++;
 	}
 	return (0);

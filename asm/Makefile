@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME =	asm
-FLAGS =	-Wall -Wextra -Werror -O0
+FLAGS =	-Wall -Wextra -Werror -O0 -ggdb3
 CC = gcc
 SRC = $(wildcard *.c) $(wildcard ../libft/*.c)
 OBJ = $(SRC:.c=.o)
@@ -22,7 +22,7 @@ OBJ = $(SRC:.c=.o)
 all: 		$(NAME)
 
 $(NAME):	$(OBJ)
-			$(CC) $(OBJ) -o $(NAME) $(LFLAGS)
+			$(CC) -O0 -ggdb3 $(OBJ) -o $(NAME) $(LFLAGS)
 
 clean:
 			/bin/rm -f $(NAME)

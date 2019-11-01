@@ -14,29 +14,22 @@
 
 char	*ft_strtrim(char const *s)
 {
-	int		stt;
-	int		end;
-	char	*str;
-	char	*ret;
+	size_t	min;
+	size_t	max;
+	size_t	len;
 
-	if (s)
-	{
-		stt = 0;
-		end = 0;
-		while (ft_iswhite(s[stt]))
-			stt++;
-		while (s[end])
-			end++;
-		end--;
-		while ((stt <= end) && ft_iswhite(s[end]))
-			end--;
-		if (!(str = (char *)malloc((end + 1) - stt + 1)))
-			return (NULL);
-		ret = str;
-		while (stt <= end)
-			*str++ = s[stt++];
-		*str = '\0';
-		return (ret);
-	}
-	return (NULL);
+	if (!s)
+		return (NULL);
+	min = 0;
+	while (s[min] != '\0'
+			&& (s[min] == ' ' || s[min] == '\n' || s[min] == '\t'))
+		min++;
+	max = ft_strlen(s);
+	while (min < max
+			&& (s[max - 1] == ' ' || s[max - 1] == '\n' || s[max - 1] == '\t'))
+		max--;
+	if (min == max)
+		return (ft_strnew(1));
+	len = max - min;
+	return (ft_strsub(s, min, len));
 }

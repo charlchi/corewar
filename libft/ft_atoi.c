@@ -18,12 +18,13 @@ int		ft_atoi(const char *nptr)
 	unsigned long	n;
 	int				neg;
 
+	if (nptr == NULL)
+		return 0;
 	n = 0;
 	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\v' || *nptr == '\f'
 			|| *nptr == '\r' || *nptr == '\n')
 		nptr++;
-	if (ft_issign(nptr, &neg, &cut))
-		nptr++;
+	nptr += ft_issign(nptr, &neg, &cut);
 	while (*nptr && (*nptr >= '0' && *nptr <= '9'))
 	{
 		n = n * 10 + ((*nptr++ - '0'));
